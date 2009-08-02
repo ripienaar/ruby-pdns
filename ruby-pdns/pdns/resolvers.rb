@@ -7,10 +7,16 @@ module Pdns
         # Adds a resolver to the list of known resolvers
         # 
         # name - should be the DNS RR to answer for
-        # options - hash with :type => :query being the only option
+        # options - hash with :type => :record being the only option
         # block - the code to be executed for each lookup
         def self.add_resolver(name, options = {}, &block)
             @@resolvers[name] = {:options => options, :block => block}
+        end
+
+        # Use this to figure out if a specific request could be answered by 
+        # a registered resolver
+        def can_answer?(request)
+            @@resolvers.has_key? request[:qname]
         end
 
         # Performs an actual query and returns a Pdns::Response class
@@ -30,6 +36,10 @@ module Pdns
         def do_query(query)
             qname = query[:qname]
             answer = Pdns::Response.new(qname)
+
+            # Set sane defaults
+            answer.id query[:id].to_i
+            answer.qclass query[:qclass]
 
             if @@resolvers.has_key?(qname)
                 r = @@resolvers[qname]

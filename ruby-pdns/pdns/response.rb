@@ -7,7 +7,7 @@ module Pdns
         VALIDQCLASSES = [:IN]
 
         def initialize(qname)
-            @response = {:qtype => :A, :content => [], :qclass => :IN, :ttl => 3600}
+            @response = {:qtype => :A, :content => [], :qclass => :IN, :ttl => 3600, :id => 1}
             @response[:qname] = qname
         end
 
@@ -19,7 +19,7 @@ module Pdns
             ans = []
 
             @response[:content].each do |a|
-                ans << "DATA\t#{@response[:qname]}\t#{@response[:qclass]}\t#{@response[:qtype]}\t#{a}"
+                ans << "DATA\t#{@response[:qname]}\t#{@response[:qclass]}\t#{@response[:qtype]}\t#{@response[:ttl]}\t#{@response[:id]}\t#{a}"
             end
 
             ans
@@ -50,6 +50,15 @@ module Pdns
         end
 
         # Verifies the ttl is numeric and sets it into the response
+        def id(t)
+            if t.class == Fixnum
+                @response[:id] = t
+            else
+                raise Pdns::InvalidID, "ID must be integer"
+            end
+        end
+        # Verifies the ttl is numeric and sets it into the response
+
         def ttl(t)
             if t.class == Fixnum
                 @response[:ttl] = t

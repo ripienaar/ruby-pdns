@@ -66,7 +66,7 @@ module Pdns
         def load_records
             if File.exists?(@config[:records_dir])
                 records = Dir.new(@config[:records_dir]) 
-                records.entries.grep(/^[^.]/).each do |r|
+                records.entries.grep(/\.prb$/).each do |r|
                     Pdns::Runner.warn("Loading new record from #{@config[:records_dir]}/#{r}")
                     Kernel.load("#{@config[:records_dir]}/#{r}")
                 end

@@ -11,6 +11,7 @@ URL: http://www.devco.net/
 Source0: %{name}-%{version}.tgz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires: ruby
+Requires: pdns
 BuildArch: noarch
 Packager: R.I.Pienaar <rip@devco.net>
 

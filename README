@@ -74,6 +74,12 @@
 # PDNS annoyingly tries to resolve CNAMES, not desired if you use PDNS just for hosting ruby records:
 #    skip-cname=yes
 #
+# PDNS tends to do a lot of caching, it will also cache the answers from pipes, you would need
+# to turn that off if you do things like GeoIP based queries
+#
+#    query-cache-ttl=0
+#    negquery-cache-ttl=0
+#
 # The pipe runner itself is configurable in /etc/pdns/pdns-ruby-backend.cfg by default:
 #
 #     logfile = /var/log/pdns/pipe-backend.log

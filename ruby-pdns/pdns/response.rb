@@ -1,4 +1,6 @@
 module Pdns
+    # Class that holds a response, the 'answer' variable in the record block will be
+    # an instance of this 
     class Response
         # Valid query types we understand
         VALIDQTYPES = [:A, :CNAME, :SOA, :NS, :SRV]

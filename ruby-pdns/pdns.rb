@@ -8,13 +8,15 @@ class Array
     end
 end
 
+# Top module for pdns backends, record code will execute at this
+# level so functions like 'country' need to be created here as
+# class methods and should typically just wrap around other classes
+# that does the hard work.
 module Pdns
     class UnknownQueryType < RuntimeError; end
     class UnknownQueryClass < RuntimeError; end
     class InvalidTTL < RuntimeError; end
     class InvalidID < RuntimeError; end
-    class UnknownRecord < RuntimeError; end
-    class UnparsableInputFromPDNS < RuntimeError; end
 
     autoload :Resolvers, "pdns/resolvers.rb"
     autoload :Response, "pdns/response.rb"

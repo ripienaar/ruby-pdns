@@ -1,4 +1,6 @@
 module Pdns
+    # class that holds instances of all resolvers, does queries against them
+    # and loads them from disk
     class Resolvers
         include Pdns
 

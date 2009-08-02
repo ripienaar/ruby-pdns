@@ -1,4 +1,8 @@
 module Pdns
+    # The workhorse class for the framework, speads directly to PDNS
+    # via STDIN and STDOUT. 
+    #
+    # It requires your PDNS to speak ABI version 2.
     class Runner
         @logger = nil
 
@@ -17,6 +21,7 @@ module Pdns
         end
 
         private
+        # Listens on STDIN for messages from PDNS and process them
         def pdns_loop
             STDIN.each do |pdnsinput|
                 pdnsinput.chomp!
@@ -59,10 +64,13 @@ module Pdns
             end
         end
 
+        # Handshakes with PDNS, if PDNS is not set up for ABI version 2 handshake will fail
+        # and the backend will exit
         def handshake
             unless STDIN.gets.chomp =~ /HELO\t2/
-                @logger.error("Did not receive a BI version 2 handshake correctly from pdns")
+                @logger.error("Did not receive an ABI version 2 handshake correctly from pdns")
                 puts("FAIL")
+                exit
             end
 
             @logger.info("Ruby PDNS #{$$} backend starting")

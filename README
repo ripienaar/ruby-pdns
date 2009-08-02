@@ -48,8 +48,8 @@
 # in future, this will be very needs driven, adding new ones are very easy, see Pdns.country and Pdns::GeoIP
 #
 # HANDLING SPECIFIC TYPES OF QUERY:
-# - MX queries require you to set answer.qtype :MX and to use '10\tmx.you.com' type content answers
-#   you must use a tab between the priority and the hostname.  The same principal for SRV etc, just
+# - MX queries require you to set answer.qtype :MX and to use '10\tmx.you.com' type content answers.
+#   You must use a tab between the priority and the hostname.  Use the same principal for SRV etc, just
 #   tab delimit your various parts of the answers
 #
 # CONFIGURING PDNS:
@@ -60,13 +60,18 @@
 #    pipebackend-abi-version=2
 #    distributor-threads=3
 #
+# PDNS will do a lot of junk queries to your pipe by default, you can limit it using the setting
+# below see the pdns docs for more examples it's quite complex.
+#
+#    pipe-regex=^foo.your.net;(A|ANY)$
+#
 # If you want to specifically set the order of answers you should also set:
 #    no-shuffle=on
 # 
-# If you use PDNS just for this, you should probably set:
+# If you use PDNS just for hosting ruby records, you should probably set:
 #    out-of-zone-additional-processing=no
 #
-# PDNS annoyingly tries to resolve CNAMES, not desired if you use PDNS just for this:
+# PDNS annoyingly tries to resolve CNAMES, not desired if you use PDNS just for hosting ruby records:
 #    skip-cname=yes
 #
 # The pipe runner itself is configurable in /etc/pdns/pdns-ruby-backend.cfg by default:
@@ -102,11 +107,17 @@
 # files etc, because that will cause unexpected exits from the code
 #
 # DEPLOYMENT ARCHITECTURE:
+# Careful consideration should be given to how you deploy this, choosing to run behind bind for example will mean
+# you cannot do GeoIP based lookups.
+#
 # Possible rollout scenarios are to do all your DNS through PDNS, lot's of people do it and it might be a good option
 # this code would compliment that kind of setup.
 #
+# You could run this on some IPs that just have NS records pointed at them for your special records.
+#
 # Another option would be to use bind to just forward queries for records you know are handled by this to PDNS, set up 
-# PDNS to listen on another port and do something like this in bind, assming PDNS on port 5300:
+# PDNS to listen on another port and do something like this in bind, asusming PDNS on port 5300, in this scenario you 
+# could not use the GeoIP functions since obviously remote-ip would be that of the bind server and not the client:
 #
 # zone "foo.your.net" {
 #        type forward;

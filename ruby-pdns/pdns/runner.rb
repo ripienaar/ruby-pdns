@@ -144,10 +144,12 @@ module Pdns
                        Pdns::Runner.debug("END")
                        puts("END")
                     else
-                       @@logger.error("Asked to serve #{request[:qname]} but don't know how")
+                       @@logger.info("Asked to serve #{request[:qname]} but don't know how")
 
                        # Send an END and not a FAIL, FAIL results in PDNS sending SERVFAIL to the clients
-                       # which is just very retarded, #fail
+                       # which is just very retarded, #fail.
+                       #
+                       # The example in the docs and tarball behaves the same way.
                        puts("END")
                     end
                 # requests like: AXFR 1

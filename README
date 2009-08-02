@@ -49,5 +49,23 @@
 # copy pdns-pipe-runner.rb to /usr/bin and create your log and records dirs, that should be it in addition to setting
 # configs and creating actual record logic.
 #
+# TESTING
+# You can test your code through just running pdns and doing queries but often that masks weird exceptions and such
+# to test it interactively do something like this:
 #
-# Contact R.I.Pienaar via www.devco.net for more information# 
+# $ pdns-pipe-runner.rb
+# > HELO    2
+# < OK      Ruby PDNS backend starting
+# > Q       foo.my.net      IN      ANY     -1      127.0.0.1       127.0.0.1
+# < DATA    foo.my.net      IN      A       600     -1      4.3.2.1
+# < DATA    foo.my.net      IN      A       600     -1      1.2.3.4
+# < END
+#
+# Lines with > would be what you'd type and < wold be sane responses, simply ^C when done, you can increase the debug etc
+# to get more useful info in logs too.  Setting logfile to /dev/stderr is useful too for interactive logging like this
+# 
+# If this works you should be good to go, just be sure that you did not inadvertantly change the ownerships on log
+# files etc, because that will cause unexpected exits from the code
+#
+# Contact R.I.Pienaar via www.devco.net for more information
+

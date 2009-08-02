@@ -79,6 +79,7 @@
 #
 #    query-cache-ttl=0
 #    negquery-cache-ttl=0
+#    cache-ttl=0
 #
 # The pipe runner itself is configurable in /etc/pdns/pdns-ruby-backend.cfg by default:
 #

@@ -138,6 +138,8 @@
 #   just need to add signal handlers, for now you need to restart pdns, don't just kill the backends
 # - Some kind of stats handling, perhaps through the pdns webserver
 # - Some kind of handling of external data like monitoring data etc
+# - Give each record block an id and track that id, answering AXFR <id> questions correctly with a per 
+#   record SOA block
 #
 # HISTORY
 # - 2009-08-02 - first release

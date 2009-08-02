@@ -1,7 +1,6 @@
 #!/usr/bin/ruby
 
 require 'pdns.rb'
-require 'pp'
 
 module Pdns
     newrecord("puppet.pinetecltd.net", :type => :record) do |query, answer|
@@ -29,35 +28,3 @@ end
 
 
 pdns = Pdns::Runner.new
-exit
-
-puts("Looking up puppet.pinetecltd.net from 207.192.75.148")
-r = pdns.do_query({:qname    => "puppet.pinetecltd.net",
-              :qclass => :IN,
-              :qtype => :ANY,
-              :id => 1,
-              :localip => "127.0.0.2",
-              :remoteip => "207.192.75.148" })
-
-print_response r
-
-puts("\n\nLooking up foo.pinetecltd.net from 78.47.195.198")
-r = pdns.do_query({:qname    => "foo.pinetecltd.net",
-              :qclass => :IN,
-              :qtype => :ANY,
-              :id => 1,
-              :localip => "127.0.0.2",
-              :remoteip => "78.47.195.198" })
-
-print_response r
-
-puts("\n\nLooking up foo.pinetecltd.net from 207.192.75.148")
-r = pdns.do_query({:qname    => "foo.pinetecltd.net",
-              :qclass => :IN,
-              :qtype => :ANY,
-              :id => 1,
-              :localip => "127.0.0.2",
-              :remoteip => "207.192.75.148" })
-
-print_response r
-# vi:tabstop=4:expandtab:ai:filetype=ruby

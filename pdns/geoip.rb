@@ -1,4 +1,8 @@
 module Pdns
+    # Simple GeoIP backend that uses Net::GeoIP that only supports
+    # country by_address and by_name at the moment. 
+    #
+    # http://geolite.maxmind.com/download/geoip/api/ruby/
     module Geoip
         @@geoip = nil
 

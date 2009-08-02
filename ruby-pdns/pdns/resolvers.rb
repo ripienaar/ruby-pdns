@@ -12,6 +12,7 @@ module Pdns
         # options - hash with :type => :record being the only option
         # block - the code to be executed for each lookup
         def self.add_resolver(name, options = {}, &block)
+            Pdns::Runner.debug("Adding resolver #{name} into list of workers")
             @@resolvers[name] = {:options => options, :block => block}
         end
 

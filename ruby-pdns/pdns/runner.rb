@@ -4,7 +4,7 @@ module Pdns
     #
     # It requires your PDNS to speak ABI version 2.
     class Runner
-        @logger = nil
+        @@logger = nil
 
         def initialize(configfile = "/etc/pdns/pipe-backend.cfg")
             STDOUT.sync = true
@@ -17,22 +17,54 @@ module Pdns
 
             @resolver = Pdns::Resolvers.new
 
-            @logger = Logger.new(@config[:logfile], 10, 102400)
-            @logger.level = @config[:loglevel]
+            @@logger = Logger.new(@config[:logfile], 10, 102400)
+            @@logger.level = @config[:loglevel]
 
-            handshake
 
             load_records
 
+            handshake
             pdns_loop
         end
 
+        ## methods other classes can use to acces our logger
+        # logs at level INFO
+        def self.info(msg)
+            log(Logger::INFO, msg)
+        end
+
+        # logs at level WARN
+        def self.warn(msg)
+            log(Logger::WARN, msg)
+        end
+
+        # logs at level DEBUG
+        def self.debug(msg)
+            log(Logger::DEBUG, msg)
+        end
+
+        # logs at level FATAL
+        def self.fatal(msg)
+            log(Logger::FATAL, msg)
+        end
+
+        # logs at level ERROR
+        def self.error(msg)
+            log(Logger::ERROR, msg)
+        end
+
         private
+        # helper to do some fancy logging with caller information etc
+        def self.log(severity, msg)
+            @@logger.add(severity) { "#{caller[3]}: #{msg}" }
+        end
+    
+        # load all files ending in .prb from the records dir
         def load_records
             if File.exists?(@config[:records_dir])
                 records = Dir.new(@config[:records_dir]) 
                 records.entries.grep(/^[^.]/).each do |r|
-                    @logger.info("Loading new record from #{r}")
+                    Pdns::Runner.info("Loading new record from #{r}")
                     Kernel.load("#{@config[:records_dir]}/#{r}")
                 end
             else
@@ -84,7 +116,7 @@ module Pdns
 
                 t = pdnsinput.split("\t")
 
-                @logger.debug("Got '#{pdnsinput}' from pdns")
+                Pdns::Runner.debug("Got '#{pdnsinput}' from pdns")
 
                 # Requests like:
                 # Q foo.my.net  IN  ANY -1  1.2.3.4 0.0.0.0
@@ -97,27 +129,27 @@ module Pdns
                                :localip     => t[6]}
 
                     if @resolver.can_answer?(request)
-                        @logger.debug("Handling lookup for #{request[:qname]} from #{request[:remoteip]}")
+                        Pdns::Runner.debug("Handling lookup for #{request[:qname]} from #{request[:remoteip]}")
 
                         answers = @resolver.do_query(request)
 
                         answers.response.each do |ans| 
-                            @logger.debug(ans)
+                            Pdns::Runner.debug(ans)
                             puts ans
                         end
 
-                       @logger.debug("END")
+                       Pdns::Runner.debug("END")
                        puts("END")
                     else
-                       @logger.error("Asked to serve #{request[1]} but don't know how")
+                       @@logger.error("Asked to serve #{request[1]} but don't know how")
                        puts("FAIL")
                     end
                 # requests like: AXFR 1
                 elsif t.size == 2
-                    @logger.debug("END")
+                    Pdns::Runner.debug("END")
                     puts("END")
                 else
-                    @logger.error("PDNS sent '#{pdnsinput}' which made no sense")
+                    Pdns::Runner.error("PDNS sent '#{pdnsinput}' which made no sense")
                     puts("FAIL")
                 end
             end
@@ -127,12 +159,12 @@ module Pdns
         # and the backend will exit
         def handshake
             unless STDIN.gets.chomp =~ /HELO\t2/
-                @logger.error("Did not receive an ABI version 2 handshake correctly from pdns")
+                Pdns::Runner.error("Did not receive an ABI version 2 handshake correctly from pdns")
                 puts("FAIL")
                 exit
             end
 
-            @logger.info("Ruby PDNS backend starting with PID #{$$}")
+            Pdns::Runner.info("Ruby PDNS backend starting with PID #{$$}")
 
             puts("OK\tRuby Bayes PDNS backend starting")
         end

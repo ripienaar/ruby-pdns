@@ -1,0 +1,53 @@
+# Ruby PDNS Pipe Backend
+#
+# This is a framework for hosting specific records using Power DNS, you can code the logic
+# for these records in ruby, the framework takes care of the hard work like hosting your
+# code and speaking to PDNS.
+#
+# A sample record code would be, this is all you would need to do to host foo.your.net in
+# PDNS and do GeoIP look ups and respond correctly
+#
+# module Pdns
+#    newrecord("foo.your.net", :type => :record) do |query, answer|
+#        answer.qtype :A
+#        answer.ttl 600
+#    
+#        case country(query[:remoteip])
+#            when "DE"
+#                answer.content "1.2.3.4"
+#            else
+#                answer.content "4.3.2.1"
+#                answer.content "1.2.3.4"
+#        end
+#    end
+# end  
+#
+# The code is real ruby code the framework provides hooks into the query and answer via the two
+# parameters.  You would drop this code into files like /etc/pdns/records/foo.prb, only the 
+# extension matters for file names.
+#
+# It's fairly early days for the code, it's envisioned that other lookups like GeoIP will be supported
+# in future, this will be very needs driven, adding new ones are very easy, see Pdns.country and Pdns::GeoIP
+#
+# Integrating with Power DNS is through the pdns.conf:
+#
+#    launch=pipe
+#    pipe-command=/usr/bin/pdns-pipe-runner.rb
+#    pipebackend-abi-version=2
+#
+# The pipe runner itself is configurable in /etc/pdns/pdns-ruby-backend.cfg by default:
+#
+#     logfile = /var/log/pdns/pipe-backend.log
+#     loglevel = warn
+#     records_dir = /etc/pdns/records
+#
+# Possible log levels are debug|info|warn|fatal|error meaningful values are probably just debug, info and warn
+# a good production setup would be warn as this will log what backends get loaded and not much more.
+#
+# INSTALLING:
+# Copy pdns.rb and pdns directory into your ruby site dir, on my machine it is /usr/lib/ruby/site_ruby/1.8,
+# copy pdns-pipe-runner.rb to /usr/bin and create your log and records dirs, that should be it in addition to setting
+# configs and creating actual record logic.
+#
+#
+# Contact R.I.Pienaar via www.devco.net for more information# 

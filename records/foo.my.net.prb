@@ -1,15 +1,15 @@
 module Pdns
-    newrecord("foo.pinetecltd.net", :type => :record) do |query, answer|
+    newrecord("foo.my.net", :type => :record) do |query, answer|
         answer.qclass query[:qclass]
         answer.qtype :A
         answer.ttl 600
     
         case country(query[:remoteip])
             when "DE"
-                answer.content "1.2.3.4"
+                answer.content "10.0.0.1"
             else
-                answer.content "4.3.2.1"
-                answer.content "1.2.3.4"
+                answer.content "10.2.0.1"
+                answer.content "10.3.0.1"
         end
     end
 end

@@ -20,11 +20,14 @@ module Pdns
             @@logger = Logger.new(@config[:logfile], 10, 102400)
             @@logger.level = @config[:loglevel]
 
+            Pdns::Runner.warn("Runner starting")
 
             load_records
 
             handshake
             pdns_loop
+
+            Pdns::Runner.warn("Runner exiting")
         end
 
         ## methods other classes can use to acces our logger
@@ -56,7 +59,7 @@ module Pdns
         private
         # helper to do some fancy logging with caller information etc
         def self.log(severity, msg)
-            @@logger.add(severity) { "#{caller[3]}: #{msg}" }
+            @@logger.add(severity) { "#{$$} #{caller[3]}: #{msg}" }
         end
     
         # load all files ending in .prb from the records dir
@@ -64,7 +67,7 @@ module Pdns
             if File.exists?(@config[:records_dir])
                 records = Dir.new(@config[:records_dir]) 
                 records.entries.grep(/^[^.]/).each do |r|
-                    Pdns::Runner.info("Loading new record from #{r}")
+                    Pdns::Runner.warn("Loading new record from #{@config[:records_dir]}/#{r}")
                     Kernel.load("#{@config[:records_dir]}/#{r}")
                 end
             else
@@ -129,7 +132,7 @@ module Pdns
                                :localip     => t[6]}
 
                     if @resolver.can_answer?(request)
-                        Pdns::Runner.debug("Handling lookup for #{request[:qname]} from #{request[:remoteip]}")
+                        Pdns::Runner.info("Handling lookup for #{request[:qname]} from #{request[:remoteip]}")
 
                         answers = @resolver.do_query(request)
 
@@ -166,7 +169,7 @@ module Pdns
 
             Pdns::Runner.info("Ruby PDNS backend starting with PID #{$$}")
 
-            puts("OK\tRuby Bayes PDNS backend starting")
+            puts("OK\tRuby PDNS backend starting")
         end
     end
 end

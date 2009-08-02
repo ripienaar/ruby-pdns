@@ -2,4 +2,4 @@
 
 require 'pdns.rb'
 
-Pdns::Runner.new("pdns-backend.cfg")
+Pdns::Runner.new("/etc/pdns/pdns-ruby-backend.cfg")

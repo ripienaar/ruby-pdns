@@ -144,8 +144,11 @@ module Pdns
                        Pdns::Runner.debug("END")
                        puts("END")
                     else
-                       @@logger.error("Asked to serve #{request[1]} but don't know how")
-                       puts("FAIL")
+                       @@logger.error("Asked to serve #{request[:qname]} but don't know how")
+
+                       # Send an END and not a FAIL, FAIL results in PDNS sending SERVFAIL to the clients
+                       # which is just very retarded, #fail
+                       puts("END")
                     end
                 # requests like: AXFR 1
                 elsif t.size == 2

@@ -22,18 +22,52 @@
 #    end
 # end  
 #
-# The code is real ruby code the framework provides hooks into the query and answer via the two
-# parameters.  You would drop this code into files like /etc/pdns/records/foo.prb, only the 
-# extension matters for file names.
+# The query hash has the following possible values:
+#
+# {:qname       => "foo.my.com",
+#  :qclass      => :IN,
+#  :qtype       => :ANY,
+#  :id          => 1,
+#  :remoteip    => "192.168.1.1",
+#  :localip     => "0.0.0.0"}
+#
+# This matches what is sent from PDNS see the PDNS pipe backend docs [1] for details
+#
+# The answer object is an instance of Pdns::Response see the rubydoc in that class for details,
+# - qtype	type of response like :A, :CNAME etc
+# - ttl		Integer value for TTL
+# - content	Call many times with whatever address to return
+# - id		Set the ID for the response, see pdns docs [1]
+# - qclass	Only :IN is currently supported
+#
+# The code in the records is real ruby code, the framework provides hooks into the query and 
+# answer via the two parameters.  You would drop this code into files like /etc/pdns/records/foo.prb, 
+# only the .prb extension matters for file names.
 #
 # It's fairly early days for the code, it's envisioned that other lookups like GeoIP will be supported
 # in future, this will be very needs driven, adding new ones are very easy, see Pdns.country and Pdns::GeoIP
 #
+# HANDLING SPECIFIC TYPES OF QUERY:
+# - MX queries require you to set answer.qtype :MX and to use '10\tmx.you.com' type content answers
+#   you must use a tab between the priority and the hostname.  The same principal for SRV etc, just
+#   tab delimit your various parts of the answers
+#
+# CONFIGURING PDNS:
 # Integrating with Power DNS is through the pdns.conf:
 #
 #    launch=pipe
 #    pipe-command=/usr/bin/pdns-pipe-runner.rb
 #    pipebackend-abi-version=2
+#    distributor-threads=3
+#
+# If you want to specifically set the order of answers you should also set:
+#    no-shuffle=on
+# 
+# If you use PDNS just for this, you should probably set:
+#    out-of-zone-additional-processing=no
+#
+# PDNS annoyingly tries to resolve CNAMES, not desired if you use PDNS just for this:
+#    skip-cname=yes
 #
 # The pipe runner itself is configurable in /etc/pdns/pdns-ruby-backend.cfg by default:
 #
@@ -66,6 +100,35 @@
 # 
 # If this works you should be good to go, just be sure that you did not inadvertantly change the ownerships on log
 # files etc, because that will cause unexpected exits from the code
+#
+# DEPLOYMENT ARCHITECTURE:
+# Possible rollout scenarios are to do all your DNS through PDNS, lot's of people do it and it might be a good option
+# this code would compliment that kind of setup.
+#
+# Another option would be to use bind to just forward queries for records you know are handled by this to PDNS, set up 
+# PDNS to listen on another port and do something like this in bind, assming PDNS on port 5300:
+#
+# zone "foo.your.net" {
+#        type forward;
+#        forward only;
+#        forwarders {
+#                127.0.0.1 port 5300;
+#        };
+# };
+#
+# TODO:
+# - Ability to signal the pipe processes to reload their config or backends, the code is capable of doing this already
+#   just need to add signal handlers, for now you need to restart pdns, don't just kill the backends
+# - Some kind of stats handling, perhaps through the pdns webserver
+# - Some kind of handling of external data like monitoring data etc
+#
+# HISTORY
+# - 2009-08-02 - first release
+#
+# REFERENCES:
+# 1 http://doc.powerdns.com/backends-detail.html
+# 2 http://www.devco.net/
+# 3 http://www.geoscaling.com/dns2/wiki/short_programming_guide_for_smart_subdomains (inspiration)
 #
 # Contact R.I.Pienaar via www.devco.net for more information
 

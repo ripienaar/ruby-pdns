@@ -44,8 +44,9 @@ rm -rf %{buildroot}
 %{ruby_sitelib}/pdns
 %config(noreplace) /etc/pdns/pdns-ruby-backend.cfg
 %config /etc/pdns/records
-/var/log/pdns
 /usr/sbin/pdns-pipe-runner.rb
+%defattr(0755,pdns,pdns,0755)
+/var/log/pdns
 
 %changelog
 * Thu Aug 02 2009 R.I.Pienaar <rip@devco.net> - 0.1

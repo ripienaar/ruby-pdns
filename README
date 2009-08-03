@@ -18,6 +18,7 @@
 #            else
 #                answer.content "4.3.2.1"
 #                answer.content "1.2.3.4"
+#                answer.content [:TXT, "Some TXT record for this response"]
 #        end
 #    end
 # end  
@@ -36,7 +37,9 @@
 # The answer object is an instance of Pdns::Response see the rubydoc in that class for details,
 # - qtype	type of response like :A, :CNAME etc
 # - ttl		Integer value for TTL
-# - content	Call many times with whatever address to return
+# - content	Call many times with whatever address to return, an array can be passed that should
+#               have a type and answer, this is to cater with returning additional records in ANY
+#               requests etc.
 # - id		Set the ID for the response, see pdns docs [1]
 # - qclass	Only :IN is currently supported
 #

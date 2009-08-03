@@ -139,6 +139,7 @@
 #   just need to add signal handlers, for now you need to restart pdns, don't just kill the backends
 # - Some kind of stats handling, perhaps through the pdns webserver
 # - Some kind of handling of external data like monitoring data etc
+# - answer.content can have different types, like PDNS asks for ANY foo, and expects to find A foo and TXT foo
 # - Give each record block an id and track that id, answering AXFR <id> questions correctly with a per 
 #   record SOA block
 #

@@ -136,13 +136,25 @@ module Pdns
 
                         answers = @resolver.do_query(request)
 
-                        answers.response.each do |ans| 
+                        # Backends are like entire zones, so in the :record type of entry we need to have
+                        # an SOA still this really is only to keep PDNS happy so we just fake it in those cases
+                        if (@resolver.type(request) == :record) && (request[:qtype] != :SOA || request[:qtype] != :ANY)
+                            ans = answers.fudge_soa
+
                             Pdns::Runner.debug(ans)
                             puts ans
                         end
 
-                       Pdns::Runner.debug("END")
-                       puts("END")
+                        # SOA requests should not get anything else than the fudged answer above
+                        if request[:qtype] != :SOA
+                            answers.response.each do |ans| 
+                                Pdns::Runner.debug(ans)
+                                puts ans
+                            end
+                        end
+
+                        Pdns::Runner.debug("END")
+                        puts("END")
                     else
                        @@logger.info("Asked to serve #{request[:qname]} but don't know how")
 

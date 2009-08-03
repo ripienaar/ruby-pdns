@@ -33,8 +33,8 @@ module Pdns
         end
 
         # Comes up with a fake SOA record that should be enough to keep PDNS from handing out ServFails #fail
-        def fudge_soa
-            ans = "DATA\t#{@response[:qname]}\t#{@response[:qclass]}\tSOA\t#{@response[:ttl]}\t#{@response[:id]}\tfoo.net. hostmaster.foo.net. 1 1800 3600 604800 3600"
+        def fudge_soa(nameserver, contact)
+            ans = "DATA\t#{@response[:qname]}\t#{@response[:qclass]}\tSOA\t#{@response[:ttl]}\t#{@response[:id]}\t#{nameserver}. #{contact}. 1 1800 3600 604800 3600"
 
             ans
         end

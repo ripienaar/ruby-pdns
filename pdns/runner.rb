@@ -87,7 +87,7 @@ module Pdns
                             val = $2
 
                             case key
-                                when "logfile", "records_dir"
+                                when "logfile", "records_dir", "soa_contact", "soa_nameserver"
                                     s = key.to_sym
                                     @config[s] = val
                                 when "loglevel"
@@ -139,7 +139,7 @@ module Pdns
                         # Backends are like entire zones, so in the :record type of entry we need to have
                         # an SOA still this really is only to keep PDNS happy so we just fake it in those cases
                         if (@resolver.type(request) == :record) && (request[:qtype] != :SOA || request[:qtype] != :ANY)
-                            ans = answers.fudge_soa
+                            ans = answers.fudge_soa(@config[:soa_contact], @config[:soa_nameserver])
 
                             Pdns::Runner.debug(ans)
                             puts ans

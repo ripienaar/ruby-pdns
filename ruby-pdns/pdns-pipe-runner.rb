@@ -7,7 +7,7 @@ opts = GetoptLong.new(
     [ '--config', '-c', GetoptLong::REQUIRED_ARGUMENT]
 )
 
-conffile = "/etc/nagger/nagger.cfg"
+conffile = "/etc/pdns/pdns-ruby-backend.cfg"
 
 opts.each do |opt, arg|
     case opt

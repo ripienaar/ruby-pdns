@@ -22,6 +22,15 @@ module Pdns
             @@resolvers.has_key? request[:qname]
         end
 
+        # Returns the type that was specified when the record was created
+        # this is like :record or future supported modes
+        def type(request)
+            if can_answer?(request)
+                name = request[:qname]
+                return @@resolvers[name][:options][:type]
+            end
+        end
+
         # Performs an actual query and returns a Pdns::Response class
         #
         # query is a hash that should have all of the following:

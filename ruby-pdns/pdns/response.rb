@@ -23,7 +23,7 @@ module Pdns
             # users can send back a 2 element array that would override the type - A, ANY, TXT, NS etc - of just that response
             @response[:content].each do |a|
                 if a.class == Array
-                    ans << "DATA\t#{@response[:qname]}\t#{@response[:qclass]}\t#{a[0]}\t#{@response[:ttl]}\t#{@response[:id]}\t#{a[1]}"
+                    ans << "DATA\t#{@response[:qname]}\t#{@response[:qclass]}\t#{a[0].to_s}\t#{@response[:ttl]}\t#{@response[:id]}\t#{a[1]}"
                 else
                     ans << "DATA\t#{@response[:qname]}\t#{@response[:qclass]}\t#{@response[:qtype]}\t#{@response[:ttl]}\t#{@response[:id]}\t#{a}"
                 end

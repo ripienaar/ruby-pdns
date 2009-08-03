@@ -13,7 +13,9 @@ module Pdns
         
             read_config(configfile, :logfile => "/var/log/pdns/pipe-backend.log",
                                     :loglevel => "info",
-                                    :records_dir => "/etc/pdns/pipe_records")
+                                    :records_dir => "/etc/pdns/pipe_records",
+                                    :soa_contact => "unconfigured.ruby.pdns.server",
+                                    :soa_nameserver => "unconfigured.ruby.pdns.server")
 
             @resolver = Pdns::Resolvers.new
 
@@ -117,9 +119,8 @@ module Pdns
             STDIN.each do |pdnsinput|
                 pdnsinput.chomp!
 
-                t = pdnsinput.split("\t")
-
                 Pdns::Runner.debug("Got '#{pdnsinput}' from pdns")
+                t = pdnsinput.split("\t")
 
                 # Requests like:
                 # Q foo.my.net  IN  ANY -1  1.2.3.4 0.0.0.0
@@ -137,8 +138,16 @@ module Pdns
                         answers = @resolver.do_query(request)
 
                         # Backends are like entire zones, so in the :record type of entry we need to have
-                        # an SOA still this really is only to keep PDNS happy so we just fake it in those cases
-                        if (@resolver.type(request) == :record) && (request[:qtype] != :SOA || request[:qtype] != :ANY)
+                        # an SOA still this really is only to keep PDNS happy so we just fake it in those cases.
+                        #
+                        # PDNS loves doing ANY requests, it'll do a lot of those even if clients do like TXT only
+                        # this is some kind of internal optimisation, not helping us since we dont cache but
+                        # so we return SOA in cases where:
+                        #
+                        # - records type is :record, in future we might support a zone type it would need to do 
+                        #   its own SOAs then
+                        # - only if we're asked for SOA or ANY records, else we'll confuse things
+                        if (@resolver.type(request) == :record) && (request[:qtype] == :SOA || request[:qtype] == :ANY)
                             ans = answers.fudge_soa(@config[:soa_contact], @config[:soa_nameserver])
 
                             Pdns::Runner.debug(ans)

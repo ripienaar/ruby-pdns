@@ -32,6 +32,13 @@ module Pdns
             ans
         end
 
+        # Comes up with a fake SOA record that should be enough to keep PDNS from handing out ServFails #fail
+        def fudge_soa
+            ans = "DATA\t#{@response[:qname]}\t#{@response[:qclass]}\tSOA\t#{@response[:ttl]}\t#{@response[:id]}\tfoo.net. hostmaster.foo.net. 1 1800 3600 604800 3600"
+
+            ans
+        end
+
         # Sets the response query type, validates it against VALIDQTYPES
         def qtype(t)
             if VALIDQTYPES.include? t

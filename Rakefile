@@ -6,7 +6,7 @@ require 'rake/clean'
 PROJ_NAME = "ruby-pdns"
 PROJ_FILES = ["build/doc", "pdns-pipe-runner.rb", "pdns.rb", "pdns", "#{PROJ_NAME}.spec", "etc", "records", "README"]
 PROJ_DOC_TITLE = "PDNS - Ruby PDNS Pipe Backend Framework"
-PROJ_VERSION = "0.1"
+PROJ_VERSION = "0.2"
 PROJ_RELEASE = "1"
 PROJ_RPM_NAMES = [PROJ_NAME]
 

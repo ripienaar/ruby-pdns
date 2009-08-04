@@ -72,7 +72,7 @@ module Pdns
 
             if c.size == 1
                 @response[:content] << c[0]
-            elsif c.size == 2
+            elsif c.size == 2 || c.size == 3
                 @response[:content] << c
             end
         end

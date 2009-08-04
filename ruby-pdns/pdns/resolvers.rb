@@ -5,6 +5,7 @@ module Pdns
         include Pdns
 
         @@resolvers = {}
+        @@resolverstats = {}
 
         # Adds a resolver to the list of known resolvers
         # 
@@ -13,7 +14,16 @@ module Pdns
         # block - the code to be executed for each lookup
         def self.add_resolver(name, options = {}, &block)
             Pdns::Runner.debug("Adding resolver #{name} into list of workers")
-            @@resolvers[name] = {:options => options, :block => block, :loadedat => Time.now, :usagecount => 0}
+            @@resolvers[name] = {:options => options, :block => block, :loadedat => Time.now}
+            @@resolverstats[name] = {:usagecount => 0}
+        end
+
+        # Clears out all the resolvers that are supported, this should be called before loading new ones from disk
+        # for example to be sure you don't have any weird leftovers
+        #
+        # It only clears the @@resolvers hash not the @@resolverstats hash to keep stats across reloads
+        def self.empty!
+            @@resolvers = {}
         end
 
         # Use this to figure out if a specific request could be answered by 
@@ -57,11 +67,11 @@ module Pdns
                 r = @@resolvers[qname]
 
                 r[:block].call(query, answer)
-
-                r[:usagecount] += 1
             else
                 raise Pdns::UnknownRecord, "Cannot find a configured record for #{qname}"
             end
+
+            @@resolverstats[qname][:usagecount] += 1
 
             answer
         end

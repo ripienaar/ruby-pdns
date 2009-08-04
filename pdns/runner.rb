@@ -16,7 +16,7 @@ module Pdns
                                     :records_dir => "/etc/pdns/pipe_records",
                                     :soa_contact => "unconfigured.ruby.pdns.server",
                                     :soa_nameserver => "unconfigured.ruby.pdns.server",
-                                    :reload_interval => 60))
+                                    :reload_interval => 60)
 
             @resolver = Pdns::Resolvers.new
 
@@ -189,7 +189,10 @@ module Pdns
                     puts("FAIL")
                 end
 
-                load_records if (Time.now - @lastrecordload) > @config[:reload_interval]
+                if (Time.now - @lastrecordload) > @config[:reload_interval].to_i
+                    Pdns::Runner.info("Reloading records from disk due to reload_interval")
+                    load_records
+                end
             end
         end
 

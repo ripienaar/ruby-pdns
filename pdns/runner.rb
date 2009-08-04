@@ -66,6 +66,8 @@ module Pdns
     
         # load all files ending in .prb from the records dir
         def load_records
+            Pdns::Resolvers.empty!
+
             if File.exists?(@config[:records_dir])
                 records = Dir.new(@config[:records_dir]) 
                 records.entries.grep(/\.prb$/).each do |r|
@@ -75,6 +77,10 @@ module Pdns
             else
                 raise("Can't find records dir #{@config[:records_dir]}")
             end
+
+            # store when we last loaded, the main loop will call this
+            # methods once a configurable interval 
+            @lastrecordload = Time.now
         end
 
         # Reads configuration from a config file, saves config in a hash @config
@@ -89,7 +95,7 @@ module Pdns
                             val = $2
 
                             case key
-                                when "logfile", "records_dir", "soa_contact", "soa_nameserver"
+                                when "logfile", "records_dir", "soa_contact", "soa_nameserver", "reload_interval"
                                     s = key.to_sym
                                     @config[s] = val
                                 when "loglevel"
@@ -181,6 +187,8 @@ module Pdns
                     Pdns::Runner.error("PDNS sent '#{pdnsinput}' which made no sense")
                     puts("FAIL")
                 end
+
+                load_records if (Time.now - @lastrecordload) > @config[:reload_interval]
             end
         end
 

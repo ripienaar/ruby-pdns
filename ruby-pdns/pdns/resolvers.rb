@@ -13,7 +13,7 @@ module Pdns
         # block - the code to be executed for each lookup
         def self.add_resolver(name, options = {}, &block)
             Pdns::Runner.debug("Adding resolver #{name} into list of workers")
-            @@resolvers[name] = {:options => options, :block => block}
+            @@resolvers[name] = {:options => options, :block => block, :loadedat => Time.now, :usagecount => 0}
         end
 
         # Use this to figure out if a specific request could be answered by 
@@ -57,6 +57,8 @@ module Pdns
                 r = @@resolvers[qname]
 
                 r[:block].call(query, answer)
+
+                r[:usagecount] += 1
             else
                 raise Pdns::UnknownRecord, "Cannot find a configured record for #{qname}"
             end

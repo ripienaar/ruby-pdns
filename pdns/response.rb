@@ -23,7 +23,11 @@ module Pdns
             # users can send back a 2 element array that would override the type - A, ANY, TXT, NS etc - of just that response
             @response[:content].each do |a|
                 if a.class == Array
-                    ans << "DATA\t#{@response[:qname]}\t#{@response[:qclass]}\t#{a[0].to_s}\t#{@response[:ttl]}\t#{@response[:id]}\t#{a[1]}"
+                    if a.size == 2
+                        ans << "DATA\t#{@response[:qname]}\t#{@response[:qclass]}\t#{a[0].to_s}\t#{@response[:ttl]}\t#{@response[:id]}\t#{a[1]}"
+                    elsif a.size == 3
+                        ans << "DATA\t#{@response[:qname]}\t#{@response[:qclass]}\t#{a[1].to_s}\t#{a[0]}\t#{@response[:id]}\t#{a[2]}"
+                    end
                 else
                     ans << "DATA\t#{@response[:qname]}\t#{@response[:qclass]}\t#{@response[:qtype]}\t#{@response[:ttl]}\t#{@response[:id]}\t#{a}"
                 end
@@ -54,14 +58,15 @@ module Pdns
         # It will take variable number of arguments, pass it one argument
         # and the record will use the default ttl, rtype etc.
         #
-        # Pass it two arguments to set special types like A, ANY, TXT etc, in 
-        # future we'll support 3 arguments to set custom TTLs too
+        # Pass it two arguments to set special types like A, ANY, TXT etc. Three
+        # arguments would be ttl, type and address.
         #
         # Sample usages:
         #
         # answer.content "1.2.3.4"
         # answer.content [:A, "1.2.3.4"]
         # answer.content :A, "1.2.3.4"
+        # answer.content 300, :A, "1.2.3.4"
         def content(*c)
             c = c.flatten
 

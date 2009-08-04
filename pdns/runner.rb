@@ -15,7 +15,8 @@ module Pdns
                                     :loglevel => "info",
                                     :records_dir => "/etc/pdns/pipe_records",
                                     :soa_contact => "unconfigured.ruby.pdns.server",
-                                    :soa_nameserver => "unconfigured.ruby.pdns.server")
+                                    :soa_nameserver => "unconfigured.ruby.pdns.server",
+                                    :reload_interval => 60))
 
             @resolver = Pdns::Resolvers.new
 

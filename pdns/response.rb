@@ -50,8 +50,26 @@ module Pdns
 
         # Append content to teh answer, when called many times the
         # answers will be appended to the record
-        def content(c)
-            @response[:content] << c
+        #
+        # It will take variable number of arguments, pass it one argument
+        # and the record will use the default ttl, rtype etc.
+        #
+        # Pass it two arguments to set special types like A, ANY, TXT etc, in 
+        # future we'll support 3 arguments to set custom TTLs too
+        #
+        # Sample usages:
+        #
+        # answer.content "1.2.3.4"
+        # answer.content [:A, "1.2.3.4"]
+        # answer.content :A, "1.2.3.4"
+        def content(*c)
+            c = c.flatten
+
+            if c.size == 1
+                @response[:content] << c[0]
+            elsif c.size == 2
+                @response[:content] << c
+            end
         end
 
         # Sets the response query class, validates it against VALIDQCLASSES

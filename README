@@ -140,7 +140,6 @@
 # TODO:
 # - Some kind of stats handling, perhaps through the pdns webserver
 # - Some kind of handling of external data like monitoring data etc
-# - answer.content can have different ttls
 # - Give each record block an id and track that id, answering AXFR <id> questions correctly with a per 
 #   record SOA block
 #

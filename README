@@ -138,6 +138,8 @@
 # };
 #
 # TODO:
+# - City, long/lat handling etc
+# - Make geoip db location configurable
 # - Some kind of stats handling, perhaps through the pdns webserver
 # - Some kind of handling of external data like monitoring data etc
 # - Give each record block an id and track that id, answering AXFR <id> questions correctly with a per 

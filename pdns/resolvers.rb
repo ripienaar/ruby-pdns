@@ -1,6 +1,11 @@
 module Pdns
     # class that holds instances of all resolvers, does queries against them
-    # and loads them from disk
+    # and loads them from disk.
+    #
+    # Queries can BeMixed.Case.Com and should be returned the same, this is a bit of a pain
+    # so we by convention store our record code with lower case and then downcase calls to it
+    # leaving it up to this class to deal with the case complexities, without these handles we
+    # will get ServFail's
     class Resolvers
         include Pdns
 
@@ -31,15 +36,25 @@ module Pdns
         # Use this to figure out if a specific request could be answered by 
         # a registered resolver
         def can_answer?(request)
-            @@resolvers.has_key? request[:qname]
+            @@resolvers.has_key? request[:qname].downcase
         end
 
         # Returns the type that was specified when the record was created
         # this is like :record or future supported modes
         def type(request)
             if can_answer?(request)
-                name = request[:qname]
+                name = request[:qname].downcase
                 return @@resolvers[name][:options][:type]
+            end
+        end
+
+        # Returns the resolver for a request, query names gets downcases from the request
+        def get_resolver(request)
+            qname = query[:qname].downcase
+            if can_answer?(request)
+                @@resolvers[qname] 
+            else
+                raise(Pdns::UnknownRecord, "Can't answer queries for #{request[:qname]}")
             end
         end
 
@@ -65,15 +80,14 @@ module Pdns
             answer.id query[:id].to_i
             answer.qclass query[:qclass]
 
-            if @@resolvers.has_key?(qname)
-                r = @@resolvers[qname]
+            begin
+                r = get_resolver(request)
 
                 r[:block].call(query, answer)
-            else
+                @@resolverstats[qname][:usagecount] += 1
+            rescue
                 raise Pdns::UnknownRecord, "Cannot find a configured record for #{qname}"
             end
-
-            @@resolverstats[qname][:usagecount] += 1
 
             answer
         end

@@ -36,7 +36,7 @@ module Pdns
         # Use this to figure out if a specific request could be answered by 
         # a registered resolver
         def can_answer?(request)
-            @@resolvers.has_key? request[:qname].downcase
+            @@resolvers.has_key?(request[:qname].downcase)
         end
 
         # Returns the type that was specified when the record was created
@@ -50,8 +50,8 @@ module Pdns
 
         # Returns the resolver for a request, query names gets downcases from the request
         def get_resolver(request)
-            qname = query[:qname].downcase
             if can_answer?(request)
+                qname = request[:qname].downcase
                 @@resolvers[qname] 
             else
                 raise(Pdns::UnknownRecord, "Can't answer queries for #{request[:qname]}")
@@ -72,21 +72,24 @@ module Pdns
         # The fields map directly to what Power DNS will in version 2 queries.
         #
         # Before a query can be answered a resolver should have been added using add_resolver
-        def do_query(query)
-            qname = query[:qname]
+        def do_query(request)
+            qname = request[:qname]
             answer = Pdns::Response.new(qname)
 
+            require 'pp'
+            pp answer
+
             # Set sane defaults
-            answer.id query[:id].to_i
-            answer.qclass query[:qclass]
+            answer.id request[:id].to_i
+            answer.qclass request[:qclass]
 
             begin
                 r = get_resolver(request)
 
-                r[:block].call(query, answer)
-                @@resolverstats[qname][:usagecount] += 1
-            rescue
-                raise Pdns::UnknownRecord, "Cannot find a configured record for #{qname}"
+                r[:block].call(request, answer)
+                @@resolverstats[qname.downcase][:usagecount] += 1
+            rescue Exception => e
+                raise Pdns::UnknownRecord, "Cannot find a configured record for #{qname}: #{e}"
             end
 
             answer

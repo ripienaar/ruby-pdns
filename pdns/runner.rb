@@ -16,11 +16,13 @@ module Pdns
                                     :records_dir => "/etc/pdns/pipe_records",
                                     :soa_contact => "unconfigured.ruby.pdns.server",
                                     :soa_nameserver => "unconfigured.ruby.pdns.server",
-                                    :reload_interval => 60)
+                                    :reload_interval => 60,
+                                    :keep_logs => 10,
+                                    :max_log_size => 1024000)
 
             @resolver = Pdns::Resolvers.new
 
-            @@logger = Logger.new(@config[:logfile], 10, 102400)
+            @@logger = Logger.new(@config[:logfile], @config[:keep_logs], @config[:max_log_size])
             @@logger.level = @config[:loglevel]
 
             Pdns::Runner.warn("Runner starting")
@@ -96,7 +98,7 @@ module Pdns
                             val = $2
 
                             case key
-                                when "logfile", "records_dir", "soa_contact", "soa_nameserver", "reload_interval"
+                                when "logfile", "records_dir", "soa_contact", "soa_nameserver", "reload_interval", "keep_logs", "max_log_size"
                                     s = key.to_sym
                                     @config[s] = val
                                 when "loglevel"

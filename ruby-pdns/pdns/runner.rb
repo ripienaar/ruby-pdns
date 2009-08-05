@@ -132,7 +132,7 @@ module Pdns
                 # Requests like:
                 # Q foo.my.net  IN  ANY -1  1.2.3.4 0.0.0.0
                 if t.size == 7
-                    request = {:qname       => t[1].downcase,
+                    request = {:qname       => t[1],
                                :qclass      => t[2].to_sym,
                                :qtype       => t[3].to_sym,
                                :id          => t[4],

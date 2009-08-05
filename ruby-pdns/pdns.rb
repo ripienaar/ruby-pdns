@@ -91,6 +91,7 @@ module Pdns
     class InvalidTTL < RuntimeError; end
     class InvalidID < RuntimeError; end
     class InvalidShuffle < RuntimeError; end
+    class UnknownRecord < RuntimeError; end
 
     autoload :Resolvers, "pdns/resolvers.rb"
     autoload :Response, "pdns/response.rb"

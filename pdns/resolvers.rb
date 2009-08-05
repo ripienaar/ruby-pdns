@@ -76,9 +76,6 @@ module Pdns
             qname = request[:qname]
             answer = Pdns::Response.new(qname)
 
-            require 'pp'
-            pp answer
-
             # Set sane defaults
             answer.id request[:id].to_i
             answer.qclass request[:qclass]

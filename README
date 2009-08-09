@@ -1,157 +1,27 @@
-# Ruby PDNS Pipe Backend
-#
-# This is a framework for hosting specific records using Power DNS, you can code the logic
-# for these records in ruby, the framework takes care of the hard work like hosting your
-# code and speaking to PDNS.
-#
-# A sample record code would be, this is all you would need to do to host foo.your.net in
-# PDNS and do GeoIP look ups and respond correctly
-#
-# module Pdns
-#    newrecord("foo.your.net", :type => :record) do |query, answer|
-#        answer.qtype :A
-#        answer.ttl 600
-#    
-#        case country(query[:remoteip])
-#            when "DE"
-#                answer.content "1.2.3.4"
-#            else
-#                answer.content "4.3.2.1"
-#                answer.content "1.2.3.4"
-#                answer.content [:TXT, "Some TXT record for this response"]
-#        end
-#    end
-# end  
-#
-# The query hash has the following possible values:
-#
-# {:qname       => "foo.my.com",
-#  :qclass      => :IN,
-#  :qtype       => :ANY,
-#  :id          => 1,
-#  :remoteip    => "192.168.1.1",
-#  :localip     => "0.0.0.0"}
-#
-# This matches what is sent from PDNS see the PDNS pipe backend docs [1] for details
-#
-# The answer object is an instance of Pdns::Response see the rubydoc in that class for details,
-# - qtype	type of response like :A, :CNAME etc
-# - ttl		Integer value for TTL
-# - content	Call many times with whatever address to return, an array can be passed that should
-#               have a type and answer, this is to cater with returning additional records in ANY
-#               requests etc.
-# - id		Set the ID for the response, see pdns docs [1]
-# - qclass	Only :IN is currently supported
-#
-# The code in the records is real ruby code, the framework provides hooks into the query and 
-# answer via the two parameters.  You would drop this code into files like /etc/pdns/records/foo.prb, 
-# only the .prb extension matters for file names.
-#
-# It's fairly early days for the code, it's envisioned that other lookups like GeoIP will be supported
-# in future, this will be very needs driven, adding new ones are very easy, see Pdns.country and Pdns::GeoIP
-#
-# HANDLING SPECIFIC TYPES OF QUERY:
-# - MX queries require you to set answer.qtype :MX and to use '10\tmx.you.com' type content answers.
-#   You must use a tab between the priority and the hostname.  Use the same principal for SRV etc, just
-#   tab delimit your various parts of the answers
-#
-# CONFIGURING PDNS:
-# Integrating with Power DNS is through the pdns.conf:
-#
-#    launch=pipe
-#    pipe-command=/usr/bin/pdns-pipe-runner.rb
-#    pipebackend-abi-version=2
-#    distributor-threads=3
-#
-# PDNS will do a lot of junk queries to your pipe by default, you can limit it using the setting
-# below see the pdns docs for more examples it's quite complex.
-#
-#    pipe-regex=^foo.your.net;(A|ANY)$
-#
-# If you want to specifically set the order of answers you should also set:
-#    no-shuffle=on
-# 
-# If you use PDNS just for hosting ruby records, you should probably set:
-#    out-of-zone-additional-processing=no
-#
-# PDNS annoyingly tries to resolve CNAMES, not desired if you use PDNS just for hosting ruby records:
-#    skip-cname=yes
-#
-# PDNS tends to do a lot of caching, it will also cache the answers from pipes, you would need
-# to turn that off if you do things like GeoIP based queries
-#
-#    query-cache-ttl=0
-#    negquery-cache-ttl=0
-#    cache-ttl=0
-#
-# The pipe runner itself is configurable in /etc/pdns/pdns-ruby-backend.cfg by default:
-#
-#     logfile = /var/log/pdns/pipe-backend.log
-#     loglevel = warn
-#     records_dir = /etc/pdns/records
-#
-# Possible log levels are debug|info|warn|fatal|error meaningful values are probably just debug, info and warn
-# a good production setup would be warn as this will log what backends get loaded and not much more.
-#
-# INSTALLING:
-# Copy pdns.rb and pdns directory into your ruby site dir, on my machine it is /usr/lib/ruby/site_ruby/1.8,
-# copy pdns-pipe-runner.rb to /usr/bin and create your log and records dirs, that should be it in addition to setting
-# configs and creating actual record logic.
-#
-# TESTING
-# You can test your code through just running pdns and doing queries but often that masks weird exceptions and such
-# to test it interactively do something like this:
-#
-# $ pdns-pipe-runner.rb
-# > HELO    2
-# < OK      Ruby PDNS backend starting
-# > Q       foo.my.net      IN      ANY     -1      127.0.0.1       127.0.0.1
-# < DATA    foo.my.net      IN      A       600     -1      4.3.2.1
-# < DATA    foo.my.net      IN      A       600     -1      1.2.3.4
-# < END
-#
-# Lines with > would be what you'd type and < wold be sane responses, simply ^C when done, you can increase the debug etc
-# to get more useful info in logs too.  Setting logfile to /dev/stderr is useful too for interactive logging like this
-# 
-# If this works you should be good to go, just be sure that you did not inadvertantly change the ownerships on log
-# files etc, because that will cause unexpected exits from the code
-#
-# DEPLOYMENT ARCHITECTURE:
-# Careful consideration should be given to how you deploy this, choosing to run behind bind for example will mean
-# you cannot do GeoIP based lookups.
-#
-# Possible rollout scenarios are to do all your DNS through PDNS, lot's of people do it and it might be a good option
-# this code would compliment that kind of setup.
-#
-# You could run this on some IPs that just have NS records pointed at them for your special records.
-#
-# Another option would be to use bind to just forward queries for records you know are handled by this to PDNS, set up 
-# PDNS to listen on another port and do something like this in bind, asusming PDNS on port 5300, in this scenario you 
-# could not use the GeoIP functions since obviously remote-ip would be that of the bind server and not the client:
-#
-# zone "foo.your.net" {
-#        type forward;
-#        forward only;
-#        forwarders {
-#                127.0.0.1 port 5300;
-#        };
-# };
-#
-# TODO:
-# - City, long/lat handling etc
-# - Make geoip db location configurable
-# - Some kind of stats handling, perhaps through the pdns webserver
-# - Some kind of handling of external data like monitoring data etc
-# - Give each record block an id and track that id, answering AXFR <id> questions correctly with a per 
-#   record SOA block
-#
-# HISTORY
-# - 2009-08-02 - first release
-#
-# REFERENCES:
-# 1 http://doc.powerdns.com/backends-detail.html
-# 2 http://www.devco.net/
-# 3 http://www.geoscaling.com/dns2/wiki/short_programming_guide_for_smart_subdomains (inspiration)
-#
-# Contact R.I.Pienaar via www.devco.net for more information
+Ruby PDNS Pipe Backend
 
+This is a framework for hosting specific records using Power DNS, you can code the logic
+for these records in ruby, the framework takes care of the hard work like hosting your
+code and speaking to PDNS.
+
+A sample record code would be, this is all you would need to do to host foo.your.net in
+PDNS and do GeoIP look ups and respond correctly
+
+module Pdns
+   newrecord("foo.your.net", :type => :record) do |query, answer|
+       answer.qtype :A
+       answer.ttl 600
+   
+       case country(query[:remoteip])
+           when "DE"
+               answer.content "1.2.3.4"
+           else
+               answer.content "4.3.2.1"
+               answer.content "1.2.3.4"
+               answer.content [:TXT, "Some TXT record for this response"]
+       end
+   end
+end  
+
+The code is hosted on Google Code at http://code.google.com/p/ruby-pdns/ find more information
+there

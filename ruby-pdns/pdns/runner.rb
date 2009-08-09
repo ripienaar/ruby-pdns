@@ -11,19 +11,12 @@ module Pdns
             STDIN.sync = true
             STDERR.sync = true
         
-            read_config(configfile, :logfile => "/var/log/pdns/pipe-backend.log",
-                                    :loglevel => "info",
-                                    :records_dir => "/etc/pdns/pipe_records",
-                                    :soa_contact => "unconfigured.ruby.pdns.server",
-                                    :soa_nameserver => "unconfigured.ruby.pdns.server",
-                                    :reload_interval => 60,
-                                    :keep_logs => 10,
-                                    :max_log_size => 1024000)
+            @config = Pdns::Config.new(configfile)
 
             @resolver = Pdns::Resolvers.new
 
-            @@logger = Logger.new(@config[:logfile], @config[:keep_logs], @config[:max_log_size])
-            @@logger.level = @config[:loglevel]
+            @@logger = Logger.new(@config.logfile, @config.keep_logs, @config.max_log_size)
+            @@logger.level = @config.loglevel
 
             Pdns::Runner.warn("Runner starting")
 
@@ -71,56 +64,19 @@ module Pdns
         def load_records
             Pdns::Resolvers.empty!
 
-            if File.exists?(@config[:records_dir])
-                records = Dir.new(@config[:records_dir]) 
+            if File.exists?(@config.records_dir)
+                records = Dir.new(@config.records_dir) 
                 records.entries.grep(/\.prb$/).each do |r|
-                    Pdns::Runner.warn("Loading new record from #{@config[:records_dir]}/#{r}")
-                    Kernel.load("#{@config[:records_dir]}/#{r}")
+                    Pdns::Runner.warn("Loading new record from #{@config.records_dir}/#{r}")
+                    Kernel.load("#{@config.records_dir}/#{r}")
                 end
             else
-                raise("Can't find records dir #{@config[:records_dir]}")
+                raise("Can't find records dir #{@config.records_dir}")
             end
 
             # store when we last loaded, the main loop will call this
             # methods once a configurable interval 
             @lastrecordload = Time.now
-        end
-
-        # Reads configuration from a config file, saves config in a hash @config
-        def read_config(configfile, defaults)
-            @config = defaults
-
-            if File.exists?(configfile)
-                File.open(configfile, "r").each do |line|
-                    unless line =~ /^#|^$/
-                         if (line =~ /(.+?)\s*=\s*(.+)/)
-                            key = $1
-                            val = $2
-
-                            case key
-                                when "logfile", "records_dir", "soa_contact", "soa_nameserver", "reload_interval", "keep_logs", "max_log_size"
-                                    s = key.to_sym
-                                    @config[s] = val
-                                when "loglevel"
-                                    case val
-                                        when "info"
-                                            @config[:loglevel] = Logger::INFO
-                                        when "warn"
-                                            @config[:loglevel] = Logger::WARN
-                                        when "debug"
-                                            @config[:loglevel] = Logger::DEBUG
-                                        when "fatal"
-                                            @config[:loglevel] = Logger::FATAL
-                                        when "error"
-                                            @config[:loglevel] = Logger::ERROR
-                                    end
-                            end
-                         end
-                    end
-                end
-            else
-                raise(RuntimeError, "Can't find config file: #{configfile}")
-            end
         end
 
         # Listens on STDIN for messages from PDNS and process them
@@ -157,7 +113,7 @@ module Pdns
                         #   its own SOAs then
                         # - only if we're asked for SOA or ANY records, else we'll confuse things
                         if (@resolver.type(request) == :record) && (request[:qtype] == :SOA || request[:qtype] == :ANY)
-                            ans = answers.fudge_soa(@config[:soa_contact], @config[:soa_nameserver])
+                            ans = answers.fudge_soa(@config.soa_contact], @config.soa_nameserver])
 
                             Pdns::Runner.debug(ans)
                             puts ans
@@ -191,7 +147,7 @@ module Pdns
                     puts("FAIL")
                 end
 
-                if (Time.now - @lastrecordload) > @config[:reload_interval].to_i
+                if (Time.now - @lastrecordload) > @config.reload_interval
                     Pdns::Runner.info("Reloading records from disk due to reload_interval")
                     load_records
                 end

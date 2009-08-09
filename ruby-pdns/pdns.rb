@@ -98,6 +98,8 @@ module Pdns
     autoload :Geoip, "pdns/geoip.rb"
     autoload :Runner, "pdns/runner.rb"
 
+    @@config = nil
+
     # Register a new code block to answer a specific
     # resource record
     def self.newrecord(name, options = {}, &block)
@@ -108,6 +110,16 @@ module Pdns
     # or IP addresses
     def self.country(host)
         Pdns::Geoip.country(host)
+    end
+
+    # Saves the config, should be an instance of Pdns::Config
+    def self.config=(config)
+        @@config = config
+    end
+
+    # Returns the previously saved instance of Pdns::Config
+    def self.config
+        @@config
     end
 end
 

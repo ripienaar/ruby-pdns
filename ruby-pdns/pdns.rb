@@ -97,6 +97,7 @@ module Pdns
     autoload :Response, "pdns/response.rb"
     autoload :Geoip, "pdns/geoip.rb"
     autoload :Runner, "pdns/runner.rb"
+    autoload :Config, "pdns/config.rb"
 
     @@config = nil
 

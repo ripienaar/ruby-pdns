@@ -16,14 +16,14 @@ module Pdns
         attr_reader :logfile, :loglevel, :records_dir, :soa_contact, :soa_nameserver, :reload_interval, :keep_logs, :max_log_size
 
         def initialize(configfile)
-            @logfile => "/var/log/pdns/pipe-backend.log"
-            @loglevel => Logger::INFO
-            @records_dir => "/etc/pdns/pipe_records"
-            @soa_contact => "unconfigured.ruby.pdns.server"
-            @soa_nameserver => "unconfigured.ruby.pdns.server"
-            @reload_interval => 60
-            @keep_logs => 10
-            @max_log_size => 1024000
+            @logfile = "/var/log/pdns/pipe-backend.log"
+            @loglevel = Logger::INFO
+            @records_dir = "/etc/pdns/pipe_records"
+            @soa_contact = "unconfigured.ruby.pdns.server"
+            @soa_nameserver = "unconfigured.ruby.pdns.server"
+            @reload_interval = 60
+            @keep_logs = 10
+            @max_log_size = 1024000
 
 
             if File.exists?(configfile)

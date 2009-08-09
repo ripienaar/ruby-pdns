@@ -99,6 +99,7 @@ module Pdns
     autoload :Runner, "pdns/runner.rb"
     autoload :Config, "pdns/config.rb"
 
+    # should have a copy of Pdns::Config
     @@config = nil
 
     # Register a new code block to answer a specific

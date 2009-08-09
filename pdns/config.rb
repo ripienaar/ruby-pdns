@@ -17,7 +17,7 @@ module Pdns
 
         def initialize(configfile)
             @logfile = "/var/log/pdns/pipe-backend.log"
-            @loglevel = Logger::INFO
+            @loglevel = "info"
             @records_dir = "/etc/pdns/pipe_records"
             @soa_contact = "unconfigured.ruby.pdns.server"
             @soa_nameserver = "unconfigured.ruby.pdns.server"
@@ -49,18 +49,7 @@ module Pdns
                                 when "max_log_size"
                                     @max_log_size = val.to_i
                                 when "loglevel"
-                                    case val
-                                        when "info"
-                                            @loglevel = Logger::INFO
-                                        when "warn"
-                                            @loglevel = Logger::WARN
-                                        when "debug"
-                                            @loglevel = Logger::DEBUG
-                                        when "fatal"
-                                            @loglevel = Logger::FATAL
-                                        when "error"
-                                            @loglevel = Logger::ERROR
-                                        end
+                                    @loglevel = val
                                 else
                                     raise("Unknown config parameter #{key}")
                             end

@@ -102,6 +102,9 @@ module Pdns
     # should have a copy of Pdns::Config
     @@config = nil
 
+    # Instance of Pdns::Logger
+    @@logger = nil
+
     # Register a new code block to answer a specific
     # resource record
     def self.newrecord(name, options = {}, &block)
@@ -123,6 +126,41 @@ module Pdns
     def self.config
         @@config
     end
-end
 
+    ## methods other classes can use to acces our logger
+    # logs at level INFO
+    def info(msg)
+        @@logger = Pdns::Logger.new unless @@logger
+
+        @@logger.log(Logger::INFO, msg)
+    end
+
+    # logs at level WARN
+    def warn(msg)
+        @@logger = Pdns::Logger.new unless @@logger
+
+        @@logger.log(Logger::WARN, msg)
+    end
+
+    # logs at level DEBUG
+    def debug(msg)
+        @@logger = Pdns::Logger.new unless @@logger
+
+        @@logger.log(Logger::DEBUG, msg)
+    end
+
+    # logs at level FATAL
+    def fatal(msg)
+        @@logger = Pdns::Logger.new unless @@logger
+
+        @@logger.log(Logger::FATAL, msg)
+    end
+
+    # logs at level ERROR
+    def error(msg)
+        @@logger = Pdns::Logger.new unless @@logger
+
+        @@logger.log(Logger::ERROR, msg)
+    end
+end
 # vi:tabstop=4:expandtab:ai:filetype=ruby

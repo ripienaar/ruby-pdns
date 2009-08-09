@@ -4,8 +4,6 @@ module Pdns
     #
     # It requires your PDNS to speak ABI version 2.
     class Runner
-        @@logger = nil
-
         def initialize(configfile = "/etc/pdns/pipe-backend.cfg")
             STDOUT.sync = true
             STDIN.sync = true
@@ -14,9 +12,6 @@ module Pdns
             @config = Pdns::Config.new(configfile)
 
             @resolver = Pdns::Resolvers.new
-
-            @@logger = Logger.new(@config.logfile, @config.keep_logs, @config.max_log_size)
-            @@logger.level = @config.loglevel
 
             Pdns::Runner.warn("Runner starting")
 
@@ -28,38 +23,6 @@ module Pdns
             Pdns::Runner.warn("Runner exiting")
         end
 
-        ## methods other classes can use to acces our logger
-        # logs at level INFO
-        def self.info(msg)
-            log(Logger::INFO, msg)
-        end
-
-        # logs at level WARN
-        def self.warn(msg)
-            log(Logger::WARN, msg)
-        end
-
-        # logs at level DEBUG
-        def self.debug(msg)
-            log(Logger::DEBUG, msg)
-        end
-
-        # logs at level FATAL
-        def self.fatal(msg)
-            log(Logger::FATAL, msg)
-        end
-
-        # logs at level ERROR
-        def self.error(msg)
-            log(Logger::ERROR, msg)
-        end
-
-        private
-        # helper to do some fancy logging with caller information etc
-        def self.log(severity, msg)
-            @@logger.add(severity) { "#{$$} #{caller[3]}: #{msg}" }
-        end
-    
         # load all files ending in .prb from the records dir
         def load_records
             Pdns::Resolvers.empty!
@@ -130,7 +93,7 @@ module Pdns
                         Pdns::Runner.debug("END")
                         puts("END")
                     else
-                       @@logger.info("Asked to serve #{request[:qname]} but don't know how")
+                       Pdns.info("Asked to serve #{request[:qname]} but don't know how")
 
                        # Send an END and not a FAIL, FAIL results in PDNS sending SERVFAIL to the clients
                        # which is just very retarded, #fail.

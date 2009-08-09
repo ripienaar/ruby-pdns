@@ -13,14 +13,14 @@ module Pdns
 
             @resolver = Pdns::Resolvers.new
 
-            Pdns::Runner.warn("Runner starting")
+            Pdns.warn("Runner starting")
 
             load_records
 
             handshake
             pdns_loop
 
-            Pdns::Runner.warn("Runner exiting")
+            Pdns.warn("Runner exiting")
         end
 
         # load all files ending in .prb from the records dir
@@ -30,7 +30,7 @@ module Pdns
             if File.exists?(@config.records_dir)
                 records = Dir.new(@config.records_dir) 
                 records.entries.grep(/\.prb$/).each do |r|
-                    Pdns::Runner.warn("Loading new record from #{@config.records_dir}/#{r}")
+                    Pdns.warn("Loading new record from #{@config.records_dir}/#{r}")
                     Kernel.load("#{@config.records_dir}/#{r}")
                 end
             else
@@ -47,7 +47,7 @@ module Pdns
             STDIN.each do |pdnsinput|
                 pdnsinput.chomp!
 
-                Pdns::Runner.debug("Got '#{pdnsinput}' from pdns")
+                Pdns.debug("Got '#{pdnsinput}' from pdns")
                 t = pdnsinput.split("\t")
 
                 # Requests like:
@@ -61,7 +61,7 @@ module Pdns
                                :localip     => t[6]}
 
                     if @resolver.can_answer?(request)
-                        Pdns::Runner.info("Handling lookup for #{request[:qname]} from #{request[:remoteip]}")
+                        Pdns.info("Handling lookup for #{request[:qname]} from #{request[:remoteip]}")
 
                         answers = @resolver.do_query(request)
 
@@ -78,19 +78,19 @@ module Pdns
                         if (@resolver.type(request) == :record) && (request[:qtype] == :SOA || request[:qtype] == :ANY)
                             ans = answers.fudge_soa(@config.soa_contact, @config.soa_nameserver)
 
-                            Pdns::Runner.debug(ans)
+                            Pdns.debug(ans)
                             puts ans
                         end
 
                         # SOA requests should not get anything else than the fudged answer above
                         if request[:qtype] != :SOA
                             answers.response.each do |ans| 
-                                Pdns::Runner.debug(ans)
+                                Pdns.debug(ans)
                                 puts ans
                             end
                         end
 
-                        Pdns::Runner.debug("END")
+                        Pdns.debug("END")
                         puts("END")
                     else
                        Pdns.info("Asked to serve #{request[:qname]} but don't know how")
@@ -103,15 +103,15 @@ module Pdns
                     end
                 # requests like: AXFR 1
                 elsif t.size == 2
-                    Pdns::Runner.debug("END")
+                    Pdns.debug("END")
                     puts("END")
                 else
-                    Pdns::Runner.error("PDNS sent '#{pdnsinput}' which made no sense")
+                    Pdns.error("PDNS sent '#{pdnsinput}' which made no sense")
                     puts("FAIL")
                 end
 
                 if (Time.now - @lastrecordload) > @config.reload_interval
-                    Pdns::Runner.info("Reloading records from disk due to reload_interval")
+                    Pdns.info("Reloading records from disk due to reload_interval")
                     load_records
                 end
             end
@@ -121,12 +121,12 @@ module Pdns
         # and the backend will exit
         def handshake
             unless STDIN.gets.chomp =~ /HELO\t2/
-                Pdns::Runner.error("Did not receive an ABI version 2 handshake correctly from pdns")
+                Pdns.error("Did not receive an ABI version 2 handshake correctly from pdns")
                 puts("FAIL")
                 exit
             end
 
-            Pdns::Runner.info("Ruby PDNS backend starting with PID #{$$}")
+            Pdns.info("Ruby PDNS backend starting with PID #{$$}")
 
             puts("OK\tRuby PDNS backend starting")
         end

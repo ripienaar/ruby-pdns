@@ -20,7 +20,7 @@ module Pdns
         def self.add_resolver(name, options = {}, &block)
             name.downcase!
 
-            Pdns::Runner.debug("Adding resolver #{name} into list of workers")
+            Pdns.debug("Adding resolver #{name} into list of workers")
             @@resolvers[name] = {:options => options, :block => block, :loadedat => Time.now}
             @@resolverstats[name] = {:usagecount => 0}
         end

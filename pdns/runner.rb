@@ -113,7 +113,7 @@ module Pdns
                         #   its own SOAs then
                         # - only if we're asked for SOA or ANY records, else we'll confuse things
                         if (@resolver.type(request) == :record) && (request[:qtype] == :SOA || request[:qtype] == :ANY)
-                            ans = answers.fudge_soa(@config.soa_contact], @config.soa_nameserver])
+                            ans = answers.fudge_soa(@config.soa_contact, @config.soa_nameserver)
 
                             Pdns::Runner.debug(ans)
                             puts ans

@@ -1,5 +1,5 @@
 module Pdns
-    newrecord("foo.my.net", :type => :record) do |query, answer|
+    newrecord("foo.my.net") do |query, answer|
         answer.qclass query[:qclass]
         answer.qtype :A
         answer.ttl 600

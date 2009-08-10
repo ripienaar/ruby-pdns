@@ -1,5 +1,5 @@
 module Pdns
-    newrecord("bar.my.net", :type => :record) do |query, answer|
+    newrecord("bar.my.net") do |query, answer|
         answer.qclass query[:qclass]
         answer.qtype :CNAME
         answer.ttl 3600

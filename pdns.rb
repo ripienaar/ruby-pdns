@@ -108,7 +108,9 @@ module Pdns
 
     # Register a new code block to answer a specific
     # resource record
-    def self.newrecord(name, options = {}, &block)
+    def self.newrecord(name, &block)
+        options = { :type => :record }
+
         Pdns::Resolvers.add_resolver(name, options, &block)
     end
 

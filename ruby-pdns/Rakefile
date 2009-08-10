@@ -66,7 +66,7 @@ task :rpm => [:archive] do
             rpmdist = ""
     end
 
-    sh %{cp build/#{PROJ_NAME}-#{CURRENT_VERSION}.tgz #{sourcedir}}
+    sh %{cp build/#{PROJ_NAME}-#{CURRENT_VERSION}-#{CURRENT_RELEASE}.tgz #{sourcedir}}
     sh %{cp #{PROJ_NAME}.spec #{specsdir}}
 
     sh %{cd #{specsdir} && rpmbuild -D 'version #{CURRENT_VERSION}' -D 'rpm_release #{CURRENT_RELEASE}' -D 'dist .#{rpmdist}' -ba #{PROJ_NAME}.spec}

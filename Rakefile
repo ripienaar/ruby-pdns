@@ -26,7 +26,7 @@ def init
 end
 
 desc "Build documentation, tar balls and rpms"
-task :default => [:clean, :doc, :archive, :rpm, :tag] do
+task :default => [:clean, :doc, :archive, :rpm] do
 end
 
 # taks for building docs
@@ -46,16 +46,6 @@ task :archive => [:clean, :doc] do
     FileUtils.mkdir_p("build/#{PROJ_NAME}-#{CURRENT_VERSION}")
     system("cp -R #{PROJ_FILES.join(' ')} build/#{PROJ_NAME}-#{CURRENT_VERSION}")
     system("cd build && /bin/tar --exclude .svn -cvzf #{PROJ_NAME}-#{CURRENT_VERSION}.tgz #{PROJ_NAME}-#{CURRENT_VERSION}")
-end
-
-desc "Tag the release in SVN"
-task :tag => [:rpm] do
-    ENV["TAGS_URL"] ? TAGS_URL = ENV["TAGS_URL"] : TAGS_URL = `/usr/bin/svn info|/bin/awk '/Repository Root/ {print $3}'`.chomp + "/tags"
-
-    raise("Need to specify a SVN url for tags using the TAGS_URL environment variable") unless TAGS_URL
-
-    announce "Tagging the release for version #{CURRENT_VERSION}-#{CURRENT_RELEASE}"
-    sh %{svn copy -m 'Hudson adding release tag #{CURRENT_VERSION}-#{CURRENT_RELEASE}' ../#{PROJ_NAME}/ #{TAGS_URL}/#{PROJ_NAME}-#{CURRENT_VERSION}-#{CURRENT_RELEASE}}
 end
 
 desc "Creates a RPM"

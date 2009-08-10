@@ -1,4 +1,5 @@
 %define ruby_sitelib %(ruby -rrbconfig -e "puts Config::CONFIG['sitelibdir']")
+%define buildnumber %{rpm_release}
 %define release %{rpm_release}%{?dist}
 
 Summary: Ruby PDNS Pipe Backend Framework
@@ -8,7 +9,7 @@ Release: %{release}
 Group: System Tools
 License: GPL
 URL: http://www.devco.net/
-Source0: %{name}-%{version}-%{release}.tgz
+Source0: %{name}-%{version}-%{buildnumber}.tgz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires: ruby ruby-net-geoip pdns GeoIP GeoIP-data
 BuildArch: noarch

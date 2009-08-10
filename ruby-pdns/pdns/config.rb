@@ -11,9 +11,10 @@ module Pdns
     #    reload_interval = 60
     #    keep_logs = 10
     #    max_log_size = 1024000
+    #    geoipdb = /var/lib/GeoIP/GeoIP.dat
     #
     class Config
-        attr_reader :logfile, :loglevel, :records_dir, :soa_contact, :soa_nameserver, :reload_interval, :keep_logs, :max_log_size
+        attr_reader :logfile, :loglevel, :records_dir, :soa_contact, :soa_nameserver, :reload_interval, :keep_logs, :max_log_size, :geoipdb
 
         def initialize(configfile)
             @logfile = "/var/log/pdns/pipe-backend.log"
@@ -48,6 +49,8 @@ module Pdns
                                     @keep_logs = val.to_i
                                 when "max_log_size"
                                     @max_log_size = val.to_i
+                                when "geoipdb"
+                                    @geoipdb = val
                                 when "loglevel"
                                     @loglevel = val
                                 else

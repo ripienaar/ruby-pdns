@@ -8,7 +8,7 @@ Release: %{release}
 Group: System Tools
 License: GPL
 URL: http://www.devco.net/
-Source0: %{name}-%{version}.tgz
+Source0: %{name}-%{version}-%{release}.tgz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires: ruby ruby-net-geoip pdns GeoIP GeoIP-data
 BuildArch: noarch

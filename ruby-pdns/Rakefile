@@ -41,11 +41,11 @@ rd = Rake::RDocTask.new(:doc) { |rdoc|
 
 desc "Create a tarball for this release"
 task :archive => [:clean, :doc] do
-    announce "Creating #{PROJ_NAME}-#{CURRENT_VERSION}.tgz"
+    announce "Creating #{PROJ_NAME}-#{CURRENT_VERSION}-#{BUILD_NUMBER}.tgz"
 
-    FileUtils.mkdir_p("build/#{PROJ_NAME}-#{CURRENT_VERSION}")
-    system("cp -R #{PROJ_FILES.join(' ')} build/#{PROJ_NAME}-#{CURRENT_VERSION}")
-    system("cd build && /bin/tar --exclude .svn -cvzf #{PROJ_NAME}-#{CURRENT_VERSION}.tgz #{PROJ_NAME}-#{CURRENT_VERSION}")
+    FileUtils.mkdir_p("build/#{PROJ_NAME}-#{CURRENT_VERSION}-#{BUILD_NUMBER}")
+    system("cp -R #{PROJ_FILES.join(' ')} build/#{PROJ_NAME}-#{CURRENT_VERSION}-#{BUILD_NUMBER}")
+    system("cd build && /bin/tar --exclude .svn -cvzf #{PROJ_NAME}-#{CURRENT_VERSION}-#{BUILD_NUMBER}.tgz #{PROJ_NAME}-#{CURRENT_VERSION}-#{BUILD_NUMBER}")
 end
 
 desc "Creates a RPM"

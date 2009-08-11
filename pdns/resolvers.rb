@@ -86,10 +86,21 @@ module Pdns
                 raise Pdns::UnknownRecord, "Cannot find a configured record for #{qname}: #{e}"
             end
 
+            # redirect stdout to /dev/null
+            orig_stdout = $stdout
+            $stdout = File.new('/dev/null', 'w')
+
             begin
                 r[:block].call(request, answer)
+
+                # restore stdout
+                $stdout = orig_stdout
+
                 @@resolverstats[qname.downcase][:usagecount] += 1
             rescue Exception => e
+                # restore stdout
+                $stdout = orig_stdout
+
                 raise Pdns::RecordCallError, "Failed to call block for #{qname}: #{e}"
             end
 

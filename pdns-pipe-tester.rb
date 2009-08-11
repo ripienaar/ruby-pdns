@@ -43,8 +43,15 @@ request = {:qname       => record,
            :remoteip    => remoteip,
            :localip     => localip}
 
-response = runner.resolver.do_query(request)
 
 puts("\nResponse for #{type.to_s} query on #{record} from #{remoteip}")
 puts
-puts response
+
+begin
+    response = runner.resolver.do_query(request)
+    puts response
+rescue Exception => e
+    puts e 
+end
+
+# vi:tabstop=4:expandtab:ai:filetype=ruby

@@ -82,11 +82,15 @@ module Pdns
 
             begin
                 r = get_resolver(request)
+            rescue Exception => e
+                raise Pdns::UnknownRecord, "Cannot find a configured record for #{qname}: #{e}"
+            end
 
+            begin
                 r[:block].call(request, answer)
                 @@resolverstats[qname.downcase][:usagecount] += 1
             rescue Exception => e
-                raise Pdns::UnknownRecord, "Cannot find a configured record for #{qname}: #{e}"
+                raise Pdns::RecordCallError, "Failed to call block for #{qname}: #{e}"
             end
 
             answer

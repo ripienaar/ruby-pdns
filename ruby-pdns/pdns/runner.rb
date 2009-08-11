@@ -6,6 +6,14 @@ module Pdns
     class Runner
         attr_reader :resolver, :config
 
+        # By default the runner will be a normal runner speaking to PDNS but when 
+        # passing anything for mode it will turn into a tester that will initialize
+        # the records, parse configs and everything it just wont handshake and speak
+        # PDNS.  Programatically you can then construct queries and send them to 
+        # the resolvers do_query method.
+        # 
+        # The entire main loop will be bypassed, so no periodic loading of records etc
+        # will be done
         def initialize(configfile = "/etc/pdns/pipe-backend.cfg", mode="runner")
             STDOUT.sync = true
             STDIN.sync = true

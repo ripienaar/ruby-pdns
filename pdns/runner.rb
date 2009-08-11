@@ -4,23 +4,30 @@ module Pdns
     #
     # It requires your PDNS to speak ABI version 2.
     class Runner
-        def initialize(configfile = "/etc/pdns/pipe-backend.cfg")
+        attr_reader :resolver, :config
+
+        def initialize(configfile = "/etc/pdns/pipe-backend.cfg", mode="runner")
             STDOUT.sync = true
             STDIN.sync = true
             STDERR.sync = true
         
             @config = Pdns::Config.new(configfile)
-
             @resolver = Pdns::Resolvers.new
 
-            Pdns.warn("Runner starting")
+            if mode == "runner"
+                Pdns.warn("Runner starting")
 
-            load_records
+                load_records
 
-            handshake
-            pdns_loop
+                handshake
 
-            Pdns.warn("Runner exiting")
+                pdns_loop
+                Pdns.warn("Runner exiting")
+            elsif
+                Pdns.warn("Tester starting")
+
+                load_records
+            end
         end
 
         # load all files ending in .prb from the records dir

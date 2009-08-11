@@ -54,7 +54,7 @@ module Pdns
                                 when "loglevel"
                                     @loglevel = val
                                 else
-                                    raise("Unknown config parameter #{key}")
+                                    Pdns.error("Unknown config parameter #{key}")
                             end
                         end
                     end

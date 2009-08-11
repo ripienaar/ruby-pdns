@@ -13,6 +13,7 @@ module Pdns
     class InvalidID < RuntimeError; end
     class InvalidShuffle < RuntimeError; end
     class UnknownRecord < RuntimeError; end
+    class RecordCallError < RuntimeError; end
 
     autoload :Resolvers, "pdns/resolvers.rb"
     autoload :Response, "pdns/response.rb"

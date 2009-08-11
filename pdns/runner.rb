@@ -63,7 +63,23 @@ module Pdns
                     if @resolver.can_answer?(request)
                         Pdns.info("Handling lookup for #{request[:qname]} from #{request[:remoteip]}")
 
-                        answers = @resolver.do_query(request)
+                        begin
+                            answers = @resolver.do_query(request)
+                        rescue Pdns::UnknownRecord => e
+                            Pddns.error("Could not serve request for #{request[:qname]} record was not found")
+
+                            puts("FAIL")
+                            next
+                        rescue Pdns::RecordCallError => e
+                            Pdns.error("Could not serve request for #{request[:qname]} record block failed: #{e}")
+
+                            puts("FAIL")
+                            next
+                        rescue Exception => e
+                            Pdns.error("Got unexpected exception while serving #{request[:qname]}: #{e}")
+                            puts("FAIL")
+                            next
+                        end
 
                         # Backends are like entire zones, so in the :record type of entry we need to have
                         # an SOA still this really is only to keep PDNS happy so we just fake it in those cases.
@@ -101,7 +117,7 @@ module Pdns
                        # The example in the docs and tarball behaves the same way.
                        puts("END")
                     end
-                # requests like: AXFR 1
+                # requests like: AXFR 1, see issue 5
                 elsif t.size == 2
                     Pdns.debug("END")
                     puts("END")

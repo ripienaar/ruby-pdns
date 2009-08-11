@@ -36,6 +36,27 @@ module Pdns
             ans
         end
 
+        # Returns a nice string representation of the response
+        def to_s
+            output = "Response for #{@response[:qname]}:\n"
+            output += "\t  Default TTL: #{@response[:ttl]}\n"
+            output += "\t Default Type: #{@response[:qtype]}\n"
+            output += "\tDefault Class: #{@response[:qclass]}\n"
+            output += "\t           ID: #{@response[:id]}\n"
+            output += "\t      Shuffle: #{@response[:shuffle]}\n"
+
+            output += "\n\tRecords:\n"
+
+            ans = response
+
+            ans.each do |a|
+                a.gsub!(/DATA\s+/, "")
+                output += "\t               #{a}"
+            end
+
+            output
+        end
+
         # Comes up with a fake SOA record that should be enough to keep PDNS from handing out ServFails #fail
         def fudge_soa(nameserver, contact)
             ans = "DATA\t#{@response[:qname]}\t#{@response[:qclass]}\tSOA\t#{@response[:ttl]}\t#{@response[:id]}\t#{nameserver}. #{contact}. 1 1800 3600 604800 3600"

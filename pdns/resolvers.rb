@@ -58,6 +58,11 @@ module Pdns
             end
         end
 
+        # Returns a hash of the stats for records
+        def stats
+            @@resolverstats
+        end
+
         # Performs an actual query and returns a Pdns::Response class
         #
         # query is a hash that should have all of the following:

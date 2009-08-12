@@ -30,6 +30,9 @@ module Pdns
                 handshake
 
                 pdns_loop
+
+                STDOUT.flush
+
                 Pdns.warn("Runner exiting")
             elsif
                 Pdns.warn("Tester starting")
@@ -57,93 +60,107 @@ module Pdns
             @lastrecordload = Time.now
         end
 
+        # General maintenance handler script
+        def do_maint
+            Pdns.info "Starting maintenance routines"
+            Pdns.info "Ending maintenance routines"
+        end
+
         # Listens on STDIN for messages from PDNS and process them
         def pdns_loop
-            STDIN.each do |pdnsinput|
-                pdnsinput.chomp!
+            while true
+                r = select([STDIN], nil, nil, @config.maint_interval)
 
-                Pdns.debug("Got '#{pdnsinput}' from pdns")
-                t = pdnsinput.split("\t")
-
-                # Requests like:
-                # Q foo.my.net  IN  ANY -1  1.2.3.4 0.0.0.0
-                if t.size == 7
-                    request = {:qname       => t[1],
-                               :qclass      => t[2].to_sym,
-                               :qtype       => t[3].to_sym,
-                               :id          => t[4],
-                               :remoteip    => t[5],
-                               :localip     => t[6]}
-
-                    if @resolver.can_answer?(request)
-                        Pdns.info("Handling lookup for #{request[:qname]} from #{request[:remoteip]}")
-
-                        begin
-                            answers = @resolver.do_query(request)
-                        rescue Pdns::UnknownRecord => e
-                            Pddns.error("Could not serve request for #{request[:qname]} record was not found")
-
-                            puts("FAIL")
-                            next
-                        rescue Pdns::RecordCallError => e
-                            Pdns.error("Could not serve request for #{request[:qname]} record block failed: #{e}")
-
-                            puts("FAIL")
-                            next
-                        rescue Exception => e
-                            Pdns.error("Got unexpected exception while serving #{request[:qname]}: #{e}")
-                            puts("FAIL")
-                            next
-                        end
-
-                        # Backends are like entire zones, so in the :record type of entry we need to have
-                        # an SOA still this really is only to keep PDNS happy so we just fake it in those cases.
-                        #
-                        # PDNS loves doing ANY requests, it'll do a lot of those even if clients do like TXT only
-                        # this is some kind of internal optimisation, not helping us since we dont cache but
-                        # so we return SOA in cases where:
-                        #
-                        # - records type is :record, in future we might support a zone type it would need to do 
-                        #   its own SOAs then
-                        # - only if we're asked for SOA or ANY records, else we'll confuse things
-                        if (@resolver.type(request) == :record) && (request[:qtype] == :SOA || request[:qtype] == :ANY)
-                            ans = answers.fudge_soa(@config.soa_contact, @config.soa_nameserver)
-
-                            Pdns.debug(ans)
-                            puts ans
-                        end
-
-                        # SOA requests should not get anything else than the fudged answer above
-                        if request[:qtype] != :SOA
-                            answers.response.each do |ans| 
+                # did we get data in time for the timeout fro the select?
+                # see issue #2 for what this is all about
+                unless r == nil
+                    pdnsinput = STDIN.gets.chomp
+    
+                    Pdns.debug("Got '#{pdnsinput}' from pdns")
+                    t = pdnsinput.split("\t")
+    
+                    # Requests like:
+                    # Q foo.my.net  IN  ANY -1  1.2.3.4 0.0.0.0
+                    if t.size == 7
+                        request = {:qname       => t[1],
+                                   :qclass      => t[2].to_sym,
+                                   :qtype       => t[3].to_sym,
+                                   :id          => t[4],
+                                   :remoteip    => t[5],
+                                   :localip     => t[6]}
+    
+                        if @resolver.can_answer?(request)
+                            Pdns.info("Handling lookup for #{request[:qname]} from #{request[:remoteip]}")
+    
+                            begin
+                                answers = @resolver.do_query(request)
+                            rescue Pdns::UnknownRecord => e
+                                Pddns.error("Could not serve request for #{request[:qname]} record was not found")
+    
+                                puts("FAIL")
+                                next
+                            rescue Pdns::RecordCallError => e
+                                Pdns.error("Could not serve request for #{request[:qname]} record block failed: #{e}")
+    
+                                puts("FAIL")
+                                next
+                            rescue Exception => e
+                                Pdns.error("Got unexpected exception while serving #{request[:qname]}: #{e}")
+                                puts("FAIL")
+                                next
+                            end
+    
+                            # Backends are like entire zones, so in the :record type of entry we need to have
+                            # an SOA still this really is only to keep PDNS happy so we just fake it in those cases.
+                            #
+                            # PDNS loves doing ANY requests, it'll do a lot of those even if clients do like TXT only
+                            # this is some kind of internal optimisation, not helping us since we dont cache but
+                            # so we return SOA in cases where:
+                            #
+                            # - records type is :record, in future we might support a zone type it would need to do 
+                            #   its own SOAs then
+                            # - only if we're asked for SOA or ANY records, else we'll confuse things
+                            if (@resolver.type(request) == :record) && (request[:qtype] == :SOA || request[:qtype] == :ANY)
+                                ans = answers.fudge_soa(@config.soa_contact, @config.soa_nameserver)
+    
                                 Pdns.debug(ans)
                                 puts ans
                             end
+    
+                            # SOA requests should not get anything else than the fudged answer above
+                            if request[:qtype] != :SOA
+                                answers.response.each do |ans| 
+                                    Pdns.debug(ans)
+                                    puts ans
+                                end
+                            end
+    
+                            Pdns.debug("END")
+                            puts("END")
+                        else
+                           Pdns.info("Asked to serve #{request[:qname]} but don't know how")
+    
+                           # Send an END and not a FAIL, FAIL results in PDNS sending SERVFAIL to the clients
+                           # which is just very retarded, #fail.
+                           #
+                           # The example in the docs and tarball behaves the same way.
+                           puts("END")
                         end
-
+                    # requests like: AXFR 1, see issue 5
+                    elsif t.size == 2
                         Pdns.debug("END")
                         puts("END")
                     else
-                       Pdns.info("Asked to serve #{request[:qname]} but don't know how")
-
-                       # Send an END and not a FAIL, FAIL results in PDNS sending SERVFAIL to the clients
-                       # which is just very retarded, #fail.
-                       #
-                       # The example in the docs and tarball behaves the same way.
-                       puts("END")
+                        Pdns.error("PDNS sent '#{pdnsinput}' which made no sense")
+                        puts("FAIL")
                     end
-                # requests like: AXFR 1, see issue 5
-                elsif t.size == 2
-                    Pdns.debug("END")
-                    puts("END")
+    
+                    if (Time.now - @lastrecordload) > @config.reload_interval
+                        Pdns.info("Reloading records from disk due to reload_interval")
+                        load_records
+                    end
                 else
-                    Pdns.error("PDNS sent '#{pdnsinput}' which made no sense")
-                    puts("FAIL")
-                end
-
-                if (Time.now - @lastrecordload) > @config.reload_interval
-                    Pdns.info("Reloading records from disk due to reload_interval")
-                    load_records
+                    do_maint 
                 end
             end
         end

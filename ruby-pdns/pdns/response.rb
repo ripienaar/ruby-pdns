@@ -51,7 +51,7 @@ module Pdns
 
             ans.each do |a|
                 a.gsub!(/DATA\s+/, "")
-                output += "\t               #{a}"
+                output += "\t               #{a}\n"
             end
 
             output

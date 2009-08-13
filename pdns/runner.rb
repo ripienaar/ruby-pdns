@@ -69,7 +69,7 @@ module Pdns
         # Listens on STDIN for messages from PDNS and process them
         def pdns_loop
             while true
-                r = select([STDIN], nil, nil, @config.maint_interval)
+                r = select([STDIN], nil, nil, @config.maint_interval.to_i)
 
                 # did we get data in time for the timeout fro the select?
                 # see issue #2 for what this is all about

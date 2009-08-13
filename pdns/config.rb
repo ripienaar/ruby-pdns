@@ -53,7 +53,7 @@ module Pdns
                                 when "geoipdb"
                                     @geoipdb = val
                                 when "maint_interval"
-                                    @maint_interval = val
+                                    @maint_interval = val.to_i
                                 when "loglevel"
                                     @loglevel = val
                                 else

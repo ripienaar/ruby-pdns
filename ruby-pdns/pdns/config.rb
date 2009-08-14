@@ -26,6 +26,7 @@ module Pdns
             @keep_logs = 10
             @max_log_size = 1024000
             @maint_interval = 60
+            @geoipdb = "/var/lib/GeoIP/GeoIP.dat"
 
 
             if File.exists?(configfile)

@@ -7,17 +7,26 @@ module Pdns
         @@geoip = nil
 
         def self.country(host)
-            init_geoip unless @@geoip
+            begin
+                init_geoip unless @@geoip
 
-            if host.match(/^\d+\.\d+\.\d+\.\d+$/)
-                return @@geoip.country_code_by_addr(host)
-            else
-                return @@geoip.country_code_by_name(host)
-            end
+                if host.match(/^\d+\.\d+\.\d+\.\d+$/)
+                    return @@geoip.country_code_by_addr(host)
+                else
+                    return @@geoip.country_code_by_name(host)
+                end
+             rescue Exception => e
+                Pdns.error("Failed to do GeoIP lookup, returning nil: #{e}")
+                return nil
+             end
         end
 
         def self.init_geoip
-            @@geoip = Net::GeoIP.open("/var/lib/GeoIP/GeoIP.dat", Net::GeoIP::TYPE_DISK)
+            if File.exists? Pdns.config.geoipdb
+                @@geoip = Net::GeoIP.open(Pdns.config.geoipdb, Net::GeoIP::TYPE_DISK)
+            else
+                raise Exception, "GeoIP data file missing: #{Pdns.config.geoipdb}"
+            end
         end
     end
 end

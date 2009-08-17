@@ -81,6 +81,7 @@ module Pdns
             starttime = Time.now.to_f
 
             qname = request[:qname]
+            lqname = qname.downcase
             answer = Pdns::Response.new(qname)
 
             # Set sane defaults
@@ -103,9 +104,9 @@ module Pdns
                 # restore stdout
                 $stdout = orig_stdout
 
-                @@resolverstats[qname.downcase][:totaltime] = 0 unless @@resolverstats[qname.downcase][:totaltime]
-                @@resolverstats[qname.downcase][:totaltime] += (Time.now.to_f - starttime)
-                @@resolverstats[qname.downcase][:usagecount] += 1
+                @@resolverstats[lqname][:totaltime] = 0 unless @@resolverstats[lqname][:totaltime]
+                @@resolverstats[lqname][:totaltime] += (Time.now.to_f - starttime)
+                @@resolverstats[lqname][:usagecount] += 1
             rescue Exception => e
                 # restore stdout
                 $stdout = orig_stdout

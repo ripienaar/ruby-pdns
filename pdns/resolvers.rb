@@ -78,6 +78,8 @@ module Pdns
         #
         # Before a query can be answered a resolver should have been added using add_resolver
         def do_query(request)
+            starttime = Time.now.to_f
+
             qname = request[:qname]
             answer = Pdns::Response.new(qname)
 
@@ -101,6 +103,8 @@ module Pdns
                 # restore stdout
                 $stdout = orig_stdout
 
+                @@resolverstats[qname.downcase][:totaltime] = 0 unless @@resolverstats[qname.downcase][:totaltime]
+                @@resolverstats[qname.downcase][:totaltime] += (Time.now.to_f - starttime)
                 @@resolverstats[qname.downcase][:usagecount] += 1
             rescue Exception => e
                 # restore stdout

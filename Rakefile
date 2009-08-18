@@ -27,7 +27,7 @@ def init
 end
 
 desc "Build documentation, tar balls and rpms"
-task :default => [:clean, :doc, :archive, :rpm] do
+task :default => [:clean, :doc, :archive, :rpm, :gem] do
 end
 
 # taks for building docs

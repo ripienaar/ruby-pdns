@@ -19,7 +19,7 @@ module Pdns
         def initialize(configfile)
             @logfile = "/var/log/pdns/pipe-backend.log"
             @loglevel = "info"
-            @records_dir = "/etc/pdns/pipe_records"
+            @records_dir = "/etc/pdns/records"
             @soa_contact = "unconfigured.ruby.pdns.server"
             @soa_nameserver = "unconfigured.ruby.pdns.server"
             @reload_interval = 60

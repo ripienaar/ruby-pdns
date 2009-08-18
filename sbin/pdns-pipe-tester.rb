@@ -5,7 +5,6 @@
 
 require 'pdns.rb'
 require 'getoptlong'
-require 'pp'
 
 opts = GetoptLong.new(
     [ '--record', '-r', GetoptLong::REQUIRED_ARGUMENT],

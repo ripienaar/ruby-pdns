@@ -30,10 +30,10 @@ rm -rf %{buildroot}
 %{__install} -d -m0755  %{buildroot}/usr/sbin
 %{__install} -d -m0755  %{buildroot}/usr/bin
 %{__install} -d -m0755  %{buildroot}/var/log/pdns
-%{__install} -m0755 pdns-pipe-runner.rb %{buildroot}/usr/sbin/pdns-pipe-runner.rb
-%{__install} -m0755 pdns-pipe-tester.rb %{buildroot}/usr/bin/pdns-pipe-tester.rb
-cp -R pdns.rb %{buildroot}/%{ruby_sitelib}/
-cp -R pdns/* %{buildroot}/%{ruby_sitelib}/pdns/
+%{__install} -m0755 sbin/pdns-pipe-runner.rb %{buildroot}/usr/sbin/pdns-pipe-runner.rb
+%{__install} -m0755 sbin/pdns-pipe-tester.rb %{buildroot}/usr/sbin/pdns-pipe-tester.rb
+cp -R lib/pdns.rb %{buildroot}/%{ruby_sitelib}/
+cp -R lib/pdns/* %{buildroot}/%{ruby_sitelib}/pdns/
 cp etc/pdns-ruby-backend-dist.cfg %{buildroot}/etc/pdns/pdns-ruby-backend.cfg
 cp -R records/* %{buildroot}/etc/pdns/records
 
@@ -46,7 +46,7 @@ rm -rf %{buildroot}
 %config(noreplace) /etc/pdns/pdns-ruby-backend.cfg
 %config /etc/pdns/records
 /usr/sbin/pdns-pipe-runner.rb
-/usr/bin/pdns-pipe-tester.rb
+/usr/sbin/pdns-pipe-tester.rb
 %defattr(0755,pdns,pdns,0755)
 /var/log/pdns
 

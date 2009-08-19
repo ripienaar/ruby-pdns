@@ -28,7 +28,6 @@ rm -rf %{buildroot}
 %{__install} -d -m0755  %{buildroot}/%{ruby_sitelib}/pdns
 %{__install} -d -m0755  %{buildroot}/etc/pdns/records
 %{__install} -d -m0755  %{buildroot}/usr/sbin
-%{__install} -d -m0755  %{buildroot}/usr/bin
 %{__install} -d -m0755  %{buildroot}/var/log/pdns
 %{__install} -m0755 sbin/pdns-pipe-runner.rb %{buildroot}/usr/sbin/pdns-pipe-runner.rb
 %{__install} -m0755 sbin/pdns-pipe-tester.rb %{buildroot}/usr/sbin/pdns-pipe-tester.rb

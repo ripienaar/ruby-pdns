@@ -23,7 +23,8 @@ module Pdns
 
         # do some fancy logging with caller information etc
         def log(severity, msg)
-            @logger.add(severity) { "#{$$} #{caller[3]}: #{msg}" }
+            from = File.basename(caller[3])
+            @logger.add(severity) { "#{$$} #{from}: #{msg}" }
         end
     end
 end

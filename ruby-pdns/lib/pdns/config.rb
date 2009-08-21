@@ -13,6 +13,12 @@ module Pdns
     #    max_log_size = 1024000
     #    geoipdb = /var/lib/GeoIP/GeoIP.dat
     #
+    # Additionally freeform config can be set for modules, these need to be handled by the modules but
+    # config lines like:
+    #    geoip.dblocation = /var/lib/GeoIP/GeoIP.dat
+    #
+    # Can be retrieved with get_module_config["geoip"] which will then be a hash, it's up to the 
+    # modules to sanity check these config vals
     class Config
         attr_reader :logfile, :loglevel, :records_dir, :soa_contact, :soa_nameserver, :reload_interval, :keep_logs, :max_log_size, :geoipdb, :maint_interval
 
@@ -27,12 +33,21 @@ module Pdns
             @max_log_size = 1024000
             @maint_interval = 60
             @geoipdb = "/var/lib/GeoIP/GeoIP.dat"
+            @modules = {}
 
 
             if File.exists?(configfile)
                 File.open(configfile, "r").each do |line|
                     unless line =~ /^#|^$/
-                        if (line =~ /(.+?)\s*=\s*(.+)/)
+                        if (line =~ /(.+?)\.(.+?)\s*=\s*(.+)/)
+                            mod = $1
+                            key = $2
+                            val = $3
+
+                            @modules[mod] = {} unless @modules[mod]
+                            @modules[mod][key] = val
+
+                        elsif (line =~ /(.+?)\s*=\s*(.+)/)
                             key = $1
                             val = $2
 
@@ -67,6 +82,15 @@ module Pdns
 
             Pdns.config = self
             self
+        end
+
+        # Retrieves config for just a specific module, returns {} if unset
+        def get_module_config(mod)
+            if @modules[mod]
+                return @modules[mod]
+            else
+                return {}
+            end
         end
     end
 end

@@ -11,7 +11,6 @@ module Pdns
     #    reload_interval = 60
     #    keep_logs = 10
     #    max_log_size = 1024000
-    #    geoipdb = /var/lib/GeoIP/GeoIP.dat
     #
     # Additionally freeform config can be set for modules, these need to be handled by the modules but
     # config lines like:
@@ -32,7 +31,6 @@ module Pdns
             @keep_logs = 10
             @max_log_size = 1024000
             @maint_interval = 60
-            @geoipdb = "/var/lib/GeoIP/GeoIP.dat"
             @modules = {}
 
 
@@ -66,8 +64,6 @@ module Pdns
                                     @keep_logs = val.to_i
                                 when "max_log_size"
                                     @max_log_size = val.to_i
-                                when "geoipdb"
-                                    @geoipdb = val
                                 when "maint_interval"
                                     @maint_interval = val.to_i
                                 when "loglevel"

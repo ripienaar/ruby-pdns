@@ -22,10 +22,16 @@ module Pdns
         end
 
         def self.init_geoip
-            if File.exists? Pdns.config.geoipdb
-                @@geoip = Net::GeoIP.open(Pdns.config.geoipdb, Net::GeoIP::TYPE_DISK)
+            # get the config and set defaults
+            config = Pdns.config.get_module_config("geoip")
+            config["dblocation"] ? dbfile = config["dblocation"] : dbfile = "/var/lib/GeoIP/GeoIP.dat"
+
+            Pdns.debug("Using #{dbfile} for geoip database")
+            
+            if File.exists? dbfile
+                @@geoip = Net::GeoIP.open(dbfile, Net::GeoIP::TYPE_DISK)
             else
-                raise Exception, "GeoIP data file missing: #{Pdns.config.geoipdb}"
+                raise Exception, "GeoIP data file missing: #{dbfile}"
             end
         end
     end

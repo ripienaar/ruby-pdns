@@ -103,7 +103,7 @@ module Pdns
             if VALIDQCLASSES.include? c
                 @response[:qclass] = c
             else
-                raise Pdns::UnknownQueryClass, "Can't handle #{t} type queries"
+                raise Pdns::UnknownQueryClass, "Can't handle #{c} type queries"
             end
         end
 

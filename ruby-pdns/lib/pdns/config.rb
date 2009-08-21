@@ -19,7 +19,7 @@ module Pdns
     # Can be retrieved with get_module_config["geoip"] which will then be a hash, it's up to the 
     # modules to sanity check these config vals
     class Config
-        attr_reader :logfile, :loglevel, :records_dir, :soa_contact, :soa_nameserver, :reload_interval, :keep_logs, :max_log_size, :geoipdb, :maint_interval
+        attr_accessor :logfile, :loglevel, :records_dir, :soa_contact, :soa_nameserver, :reload_interval, :keep_logs, :max_log_size, :geoipdb, :maint_interval
 
         def initialize(configfile)
             @logfile = "/var/log/pdns/pipe-backend.log"

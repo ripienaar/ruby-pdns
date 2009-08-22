@@ -1,0 +1,7 @@
+module Pdns
+    newrecord("test_if_handles_mixed_case_as_lower.ruby-pdns.org") do |query, answer|
+        answer.content "10.0.0.1"
+    end
+end
+
+# vi:tabstop=4:expandtab:ai:filetype=ruby

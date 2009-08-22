@@ -74,6 +74,8 @@ module Pdns
                         end
                     end
                 end
+            else
+                Pdns.error("Could not find config file #{configfile}")
             end
 
             Pdns.config = self

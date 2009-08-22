@@ -87,5 +87,10 @@ module Pdns
 
         @@logger.log(Logger::ERROR, msg)
     end
+
+    # returns the current loglevel
+    def self.loglevel
+        @@logger.logger.level
+    end
 end
 # vi:tabstop=4:expandtab:ai:filetype=ruby

@@ -1,5 +1,7 @@
 module Pdns
     class Log
+        attr_reader :logger
+
         @logger = nil
 
         def initialize
@@ -18,13 +20,19 @@ module Pdns
                     @logger.level = Logger::FATAL
                 when "error"
                     @logger.level = Logger::ERROR
+                else
+                    @logger.level = Logger::INFO
+                    log(Logger::ERROR, "Invalid log level #{config.loglevel}, defaulting to info")
             end
         end
 
         # do some fancy logging with caller information etc
         def log(severity, msg)
-            from = File.basename(caller[1])
-            @logger.add(severity) { "#{$$} #{from}: #{msg}" }
+            begin
+                from = File.basename(caller[1])
+                @logger.add(severity) { "#{$$} #{from}: #{msg}" }
+            rescue Exception => e
+            end
         end
     end
 end

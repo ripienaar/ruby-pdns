@@ -1,0 +1,7 @@
+module Pdns
+    newrecord("test_if_empty_clears_records.ruby-pdns.org") do |query, answer|
+        answer.content "10.0.0.1"
+    end
+end
+
+# vi:tabstop=4:expandtab:ai:filetype=ruby

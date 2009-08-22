@@ -31,6 +31,7 @@ module Pdns
             if File.exists? dbfile
                 @@geoip = Net::GeoIP.open(dbfile, Net::GeoIP::TYPE_DISK)
             else
+                @@geoip = nil
                 raise Exception, "GeoIP data file missing: #{dbfile}"
             end
         end

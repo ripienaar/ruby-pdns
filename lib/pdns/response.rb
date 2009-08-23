@@ -13,8 +13,11 @@ module Pdns
             @response[:qname] = qname
         end
 
-        # Returns a hash representing the response, the query content
-        # gets shuffled in case it's a multi record answer
+        # Returns an array of responses, the query content
+        # gets shuffled in case it's a multi record answer.
+        #
+        # Each array element is a string of txt exactly like
+        # pdns would expect on STDOUT
         def response
             @response[:content].shuffle! if @response[:shuffle]
             
@@ -34,6 +37,11 @@ module Pdns
             end
 
             ans
+        end
+
+        # Returns the raw response hash without parsing it into a array or anything.
+        def raw_response
+            @response
         end
 
         # Returns a nice string representation of the response

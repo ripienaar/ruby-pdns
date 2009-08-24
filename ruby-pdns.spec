@@ -34,7 +34,7 @@ rm -rf %{buildroot}
 cp -R lib/pdns.rb %{buildroot}/%{ruby_sitelib}/
 cp -R lib/pdns/* %{buildroot}/%{ruby_sitelib}/pdns/
 cp etc/pdns-ruby-backend-dist.cfg %{buildroot}/etc/pdns/pdns-ruby-backend.cfg
-cp -R records/* %{buildroot}/etc/pdns/records
+cp -R records/*sample %{buildroot}/etc/pdns/records
 
 %clean
 rm -rf %{buildroot}

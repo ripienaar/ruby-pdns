@@ -77,24 +77,24 @@ task :rpm => [:archive] do
     sh %{cp #{rpmdir}/*/#{PROJ_NAME}*-#{CURRENT_VERSION}-#{CURRENT_RELEASE}.#{rpmdist}.*.rpm pkg/}
 end
 
-spec = Gem::Specification.new do |s| 
-    s.name = PROJ_NAME
-    s.version = "#{CURRENT_VERSION}.#{CURRENT_RELEASE}"
-    s.author = "R.I.Pienaar"
-    s.email = "rip@devco.net"
-    s.homepage = "http://code.google.com/p/ruby-pdns/"
-    s.platform = Gem::Platform::RUBY
-    s.summary = "Ruby framework for developing PowerDNS backends"
-    s.files = FileList["{sbin,lib,etc}/**/*"].to_a
-    s.require_path = "lib"
-    s.bindir = "sbin"
-    s.executables = ["pdns-pipe-runner.rb", "pdns-pipe-tester.rb"]
-    s.has_rdoc = true
-    s.extra_rdoc_files = ["README"]
-end
-                             
-Rake::GemPackageTask.new(spec) do |pkg| 
-    pkg.need_tar = true 
-end 
+#spec = Gem::Specification.new do |s| 
+#    s.name = PROJ_NAME
+#    s.version = "#{CURRENT_VERSION}.#{CURRENT_RELEASE}"
+#    s.author = "R.I.Pienaar"
+#    s.email = "rip@devco.net"
+#    s.homepage = "http://code.google.com/p/ruby-pdns/"
+#    s.platform = Gem::Platform::RUBY
+#    s.summary = "Ruby framework for developing PowerDNS backends"
+#    s.files = FileList["{sbin,lib,etc}/**/*"].to_a
+#    s.require_path = "lib"
+#    s.bindir = "sbin"
+#    s.executables = ["pdns-pipe-runner.rb", "pdns-pipe-tester.rb"]
+#    s.has_rdoc = true
+#    s.extra_rdoc_files = ["README"]
+#end
+#                             
+#Rake::GemPackageTask.new(spec) do |pkg| 
+#    pkg.need_tar = true 
+#end 
 
 # vi:tabstop=4:expandtab:ai

@@ -118,7 +118,7 @@ module Pdns
                 begin
                     answers = @resolver.do_query(request)
                 rescue Pdns::UnknownRecord => e
-                    Pddns.error("Could not serve request for #{request[:qname]} record was not found")
+                    Pddns.info("Could not serve request for #{request[:qname]} record was not found")
 
                     puts("FAIL")
                     next
@@ -161,7 +161,7 @@ module Pdns
                 Pdns.debug("END")
                 puts("END")
             else
-               Pdns.error("Asked to serve #{request[:qname]} but don't know how")
+               Pdns.info("Asked to serve #{request[:qname]} but don't know how")
 
                # Send an END and not a FAIL, FAIL results in PDNS sending SERVFAIL to the clients
                # which is just very retarded, #fail.

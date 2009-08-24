@@ -62,8 +62,8 @@ module Pdns
 
         # General maintenance handler script
         def do_maint
-            Pdns.info "Starting maintenance routines"
-            Pdns.info "Ending maintenance routines"
+            Pdns.debug "Starting maintenance routines"
+            Pdns.debug "Ending maintenance routines"
         end
 
         # Listens on STDIN for messages from PDNS and process them
@@ -88,7 +88,7 @@ module Pdns
                     end
     
                     if (Time.now - @lastrecordload) > @config.reload_interval
-                        Pdns.info("Reloading records from disk due to reload_interval")
+                        Pdns.debug("Reloading records from disk due to reload_interval")
                         load_records
                     end
                 else
@@ -113,7 +113,7 @@ module Pdns
                        :localip     => t[6]}
 
             if @resolver.can_answer?(request)
-                Pdns.info("Handling lookup for #{request[:qname]} from #{request[:remoteip]}")
+                Pdns.debug("Handling lookup for #{request[:qname]} from #{request[:remoteip]}")
 
                 begin
                     answers = @resolver.do_query(request)
@@ -161,7 +161,7 @@ module Pdns
                 Pdns.debug("END")
                 puts("END")
             else
-               Pdns.info("Asked to serve #{request[:qname]} but don't know how")
+               Pdns.error("Asked to serve #{request[:qname]} but don't know how")
 
                # Send an END and not a FAIL, FAIL results in PDNS sending SERVFAIL to the clients
                # which is just very retarded, #fail.

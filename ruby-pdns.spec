@@ -7,7 +7,7 @@ Version: %{version}
 Release: %{release}
 Group: System Tools
 License: GPL
-URL: http://www.devco.net/
+URL: http://code.google.com/p/ruby-pdns/
 Source0: %{name}-%{version}-%{rpm_release}.tgz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires: ruby ruby-net-geoip pdns GeoIP GeoIP-data

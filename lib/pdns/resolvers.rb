@@ -25,7 +25,7 @@ module Pdns
 
             # only set this if there aren't already stats, else we zero the counts after
             # each periodic record reload
-            @@resolverstats[name] = {:usagecount => 0, :totaltime => 1} unless @@resolverstats[name]
+            @@resolverstats[name] = {:usagecount => 0, :totaltime => 0} unless @@resolverstats[name]
         end
 
         # Clears out all the resolvers that are supported, this should be called before loading new ones from disk

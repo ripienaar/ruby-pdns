@@ -74,7 +74,7 @@ module Pdns
                 @lastmaint = Time.now
 
                 begin
-                    File.open("#{@config.statsdir}/#{Time.now.to_i}.pstat", 'w') do |f|
+                    File.open("#{@config.statsdir}/#{$$}-#{Time.now.to_i}.pstat", 'w') do |f|
                         stats = @resolver.stats
     
                         stats.each_key do |r|

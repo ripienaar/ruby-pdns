@@ -21,6 +21,7 @@ module Pdns
         
             @config = Pdns::Config.new(configfile)
             @resolver = Pdns::Resolvers.new
+            @lastmaint = Time.now
 
             if mode == "runner"
                 Pdns.warn("Runner starting")
@@ -62,8 +63,32 @@ module Pdns
 
         # General maintenance handler script
         def do_maint
-            Pdns.debug "Starting maintenance routines"
-            Pdns.debug "Ending maintenance routines"
+            if (Time.now - @lastrecordload) > @config.reload_interval
+                Pdns.debug("Reloading records from disk due to reload_interval")
+                load_records
+            end
+
+            if (Time.now - @lastmaint) > @config.maint_interval
+                Pdns.debug "Starting maintenance routines"
+
+                @lastmaint = Time.now
+
+                begin
+                    File.open("#{@config.statsdir}/#{Time.now.to_i}.pstat", 'w') do |f|
+                        stats = @resolver.stats
+    
+                        stats.each_key do |r|
+                            stat = stats[r]
+
+                            f.puts("#{r}\tusagecount:#{stat[:usagecount]}\ttotaltime:#{stat[:totaltime]}")
+                        end
+                    end
+                rescue Exception => e
+                    Pdns.error("Could not process stats: #{e}")
+                end
+
+                Pdns.debug "Ending maintenance routines"
+            end
         end
 
         # Listens on STDIN for messages from PDNS and process them
@@ -86,11 +111,8 @@ module Pdns
                     else
                         handle_garbage_request(pdnsinput)
                     end
-    
-                    if (Time.now - @lastrecordload) > @config.reload_interval
-                        Pdns.debug("Reloading records from disk due to reload_interval")
-                        load_records
-                    end
+
+                    do_maint
                 else
                     do_maint 
                 end

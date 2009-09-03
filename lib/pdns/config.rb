@@ -11,6 +11,8 @@ module Pdns
     #    reload_interval = 60
     #    keep_logs = 10
     #    max_log_size = 1024000
+    #    maint_interval = 60
+    #    statsdir = /var/log/pdns/stats
     #
     # Additionally freeform config can be set for modules, these need to be handled by the modules but
     # config lines like:
@@ -19,7 +21,7 @@ module Pdns
     # Can be retrieved with get_module_config["geoip"] which will then be a hash, it's up to the 
     # modules to sanity check these config vals
     class Config
-        attr_accessor :logfile, :loglevel, :records_dir, :soa_contact, :soa_nameserver, :reload_interval, :keep_logs, :max_log_size, :geoipdb, :maint_interval, :modules
+        attr_accessor :logfile, :loglevel, :records_dir, :soa_contact, :soa_nameserver, :reload_interval, :keep_logs, :max_log_size, :geoipdb, :maint_interval, :modules, :statsdir
 
         def initialize(configfile)
             @logfile = "/var/log/pdns/pipe-backend.log"
@@ -32,6 +34,7 @@ module Pdns
             @max_log_size = 1024000
             @maint_interval = 60
             @modules = {}
+            @statsdir = "/var/log/pdns/stats"
 
 
             if File.exists?(configfile)
@@ -66,6 +69,8 @@ module Pdns
                                     @max_log_size = val.to_i
                                 when "maint_interval"
                                     @maint_interval = val.to_i
+                                when "statsdir"
+                                    @statsdir = val
                                 when "loglevel"
                                     @loglevel = val
                                 else

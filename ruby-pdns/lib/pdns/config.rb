@@ -79,7 +79,7 @@ module Pdns
                                 when "recordstats"
                                     val.match(/^1|y|t/i) ? @recordstats = true : @recordstats = false
                                 else
-                                    Pdns.error("Unknown config parameter #{key}")
+                                    STDERR.puts("Unknown config parameter #{key}")
                             end
                         end
                     end

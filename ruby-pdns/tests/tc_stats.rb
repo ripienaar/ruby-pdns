@@ -93,6 +93,25 @@ class TC_StatsTests < Test::Unit::TestCase
 
         File.delete("#{Pdns.config.statsdir}/#{$$}.pstat")
     end
+
+    def test_aggregates
+        Pdns.config = Pdns::Config.new("etc/pdns-ruby-backend.cfg")
+
+        s = Pdns::Stats.new
+        s.recorduse("foo", 0.1)
+        s.recorduse("foo", 0.1)
+        s.to_file("#{Pdns.config.statsdir}/123.pstat")
+        s.reset!
+
+        s.recorduse("foo", 0.1)
+        s.recorduse("bar", 0.1)
+        s.to_file("#{Pdns.config.statsdir}/124.pstat")
+
+        s.aggregate!
+
+        assert_equal 3, s.recordstats("foo")[:usagecount]
+        assert_equal 1, s.recordstats("bar")[:usagecount]
+    end
 end
 
 # vi:tabstop=4:expandtab:ai:filetype=ruby

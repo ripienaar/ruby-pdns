@@ -27,12 +27,14 @@ without having to worry about the details of integrating into PDNS etc.
 rm -rf %{buildroot}
 %{__install} -d -m0755  %{buildroot}/%{ruby_sitelib}/pdns
 %{__install} -d -m0755  %{buildroot}/etc/pdns/records
+%{__install} -d -m0755  %{buildroot}/etc/cron.d
 %{__install} -d -m0755  %{buildroot}/usr/sbin
 %{__install} -d -m0755  %{buildroot}/var/log/pdns
 %{__install} -d -m0755  %{buildroot}/var/log/pdns/stats
 %{__install} -m0755 sbin/pdns-pipe-runner.rb %{buildroot}/usr/sbin/pdns-pipe-runner.rb
 %{__install} -m0755 sbin/pdns-pipe-tester.rb %{buildroot}/usr/sbin/pdns-pipe-tester.rb
 %{__install} -m0755 sbin/pdns-aggregate-stats.rb %{buildroot}/usr/sbin/pdns-aggregate-stats.rb
+%{__install} -m0644 etc/rubypdns.cron %{buildroot}/etc/cron.d/rubypdns
 cp -R lib/pdns.rb %{buildroot}/%{ruby_sitelib}/
 cp -R lib/pdns/* %{buildroot}/%{ruby_sitelib}/pdns/
 cp etc/pdns-ruby-backend-dist.cfg %{buildroot}/etc/pdns/pdns-ruby-backend.cfg
@@ -46,6 +48,7 @@ rm -rf %{buildroot}
 %{ruby_sitelib}/pdns
 %config(noreplace) /etc/pdns/pdns-ruby-backend.cfg
 %config /etc/pdns/records
+%config /etc/cron.d/rubypdns
 /usr/sbin/pdns-pipe-runner.rb
 /usr/sbin/pdns-pipe-tester.rb
 %defattr(0755,pdns,pdns,0755)

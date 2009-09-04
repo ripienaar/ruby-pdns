@@ -10,7 +10,8 @@ module Pdns
         include Pdns
 
         @@resolvers = {}
-        @@resolverstats = {}
+
+        @@stats = nil
 
         # Adds a resolver to the list of known resolvers
         # 
@@ -23,9 +24,8 @@ module Pdns
             Pdns.debug("Adding resolver #{name} into list of workers")
             @@resolvers[name] = {:options => options, :block => block, :loadedat => Time.now}
 
-            # only set this if there aren't already stats, else we zero the counts after
-            # each periodic record reload
-            @@resolverstats[name] = {:usagecount => 0, :totaltime => 0} unless @@resolverstats[name]
+            @@stats = Pdns::Stats.new unless @@stats
+            @@stats.initstats(name)
         end
 
         # Clears out all the resolvers that are supported, this should be called before loading new ones from disk
@@ -61,9 +61,9 @@ module Pdns
             end
         end
 
-        # Returns a hash of the stats for records
+        # Returns the Pdns::Stats object that has our stats
         def stats
-            @@resolverstats
+            @@stats
         end
 
         # Performs an actual query and returns a Pdns::Response class
@@ -107,9 +107,7 @@ module Pdns
                 # restore stdout
                 $stdout = orig_stdout
 
-                @@resolverstats[lqname][:totaltime] = 0 unless @@resolverstats[lqname][:totaltime]
-                @@resolverstats[lqname][:totaltime] += (Time.now.to_f - starttime)
-                @@resolverstats[lqname][:usagecount] += 1
+                @@stats.recorduse(lqname, (Time.now.to_f - starttime))
             rescue Exception => e
                 # restore stdout
                 $stdout = orig_stdout

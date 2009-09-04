@@ -74,17 +74,9 @@ module Pdns
                 @lastmaint = Time.now
 
                 begin
-                    File.open("#{@config.statsdir}/#{$$}-#{Time.now.to_i}.pstat", 'w') do |f|
-                        stats = @resolver.stats
-    
-                        stats.each_key do |r|
-                            stat = stats[r]
-
-                            f.puts("#{r}\tusagecount:#{stat[:usagecount]}\ttotaltime:#{stat[:totaltime]}")
-                        end
-                    end
+                   @resolver.stats.save
                 rescue Exception => e
-                    Pdns.error("Could not process stats: #{e}")
+                    Pdns.error("Could not save stats: #{e}")
                 end
 
                 Pdns.debug "Ending maintenance routines"

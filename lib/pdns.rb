@@ -1,6 +1,7 @@
 require 'logger'
 require 'net/geoip'
 require 'pdns/array.rb'
+require 'yaml'
 
 # Top module for pdns backends, record code will execute at this
 # level so functions like 'country' need to be created here as
@@ -21,6 +22,7 @@ module Pdns
     autoload :Runner, "pdns/runner.rb"
     autoload :Config, "pdns/config.rb"
     autoload :Log, "pdns/log.rb"
+    autoload :Stats, "pdns/stats.rb"
 
     # should have a copy of Pdns::Config
     @@config = nil

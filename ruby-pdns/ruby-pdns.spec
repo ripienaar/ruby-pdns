@@ -29,6 +29,7 @@ rm -rf %{buildroot}
 %{__install} -d -m0755  %{buildroot}/etc/pdns/records
 %{__install} -d -m0755  %{buildroot}/usr/sbin
 %{__install} -d -m0755  %{buildroot}/var/log/pdns
+%{__install} -d -m0755  %{buildroot}/var/log/pdns/stats
 %{__install} -m0755 sbin/pdns-pipe-runner.rb %{buildroot}/usr/sbin/pdns-pipe-runner.rb
 %{__install} -m0755 sbin/pdns-pipe-tester.rb %{buildroot}/usr/sbin/pdns-pipe-tester.rb
 %{__install} -m0755 sbin/pdns-aggregate-stats.rb %{buildroot}/usr/sbin/pdns-aggregate-stats.rb
@@ -49,6 +50,7 @@ rm -rf %{buildroot}
 /usr/sbin/pdns-pipe-tester.rb
 %defattr(0755,pdns,pdns,0755)
 /var/log/pdns
+/var/log/pdns/stats
 
 %changelog
 * Tue Aug 11 2009 R.I.Pienaar <rip@devco.net> - 0.4

@@ -74,7 +74,7 @@ module Pdns
                 @lastmaint = Time.now
 
                 begin
-                   @resolver.stats.save
+                   @resolver.stats.save if Pdns.config.recordstats
                 rescue Exception => e
                     Pdns.error("Could not save stats: #{e}")
                 end

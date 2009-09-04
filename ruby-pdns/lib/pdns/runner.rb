@@ -14,7 +14,7 @@ module Pdns
         # 
         # The entire main loop will be bypassed, so no periodic loading of records etc
         # will be done
-        def initialize(configfile = "/etc/pdns/pipe-backend.cfg", mode="runner")
+        def initialize(configfile = "/etc/pdns/pdns-ruby-backend.cfg", mode="runner")
             STDOUT.sync = true
             STDIN.sync = true
             STDERR.sync = true

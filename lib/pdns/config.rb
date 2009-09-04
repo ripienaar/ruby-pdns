@@ -21,7 +21,9 @@ module Pdns
     # Can be retrieved with get_module_config["geoip"] which will then be a hash, it's up to the 
     # modules to sanity check these config vals
     class Config
-        attr_accessor :logfile, :loglevel, :records_dir, :soa_contact, :soa_nameserver, :reload_interval, :keep_logs, :max_log_size, :geoipdb, :maint_interval, :modules, :statsdir
+        attr_accessor :logfile, :loglevel, :records_dir, :soa_contact, :soa_nameserver, 
+                      :reload_interval, :keep_logs, :max_log_size, :geoipdb, :maint_interval, 
+                      :modules, :statsdir, :recordstats
 
         def initialize(configfile)
             @logfile = "/var/log/pdns/pipe-backend.log"
@@ -35,6 +37,7 @@ module Pdns
             @maint_interval = 60
             @modules = {}
             @statsdir = "/var/log/pdns/stats"
+            @recordstats = true
 
 
             if File.exists?(configfile)
@@ -73,6 +76,8 @@ module Pdns
                                     @statsdir = val
                                 when "loglevel"
                                     @loglevel = val
+                                when "recordstats"
+                                    val.match(/^1|y|t/i) ? @recordstats = true : @recordstats = false
                                 else
                                     Pdns.error("Unknown config parameter #{key}")
                             end

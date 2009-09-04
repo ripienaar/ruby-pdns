@@ -110,7 +110,10 @@ class TC_StatsTests < Test::Unit::TestCase
         s.aggregate!
 
         assert_equal 3, s.recordstats("foo")[:usagecount]
+        assert_in_delta 0.01, s.recordstats("foo")[:totaltime], 0.3
+
         assert_equal 1, s.recordstats("bar")[:usagecount]
+        assert_in_delta 0.01, s.recordstats("bar")[:totaltime], 0.1
     end
 end
 

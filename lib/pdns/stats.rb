@@ -1,16 +1,22 @@
 require 'yaml'
+require 'find'
 
 module Pdns
     class Stats
         attr_reader :stats
 
         def initialize
-            @stats = {}
+            reset!
         end
 
         # sets the stats for a record to 0
         def resetrecord(record)
             @stats[record] = newstat
+        end
+
+        # resets all stats to nil
+        def reset!
+            @stats = {}
         end
 
         # sets the stats for a record to 0 only if it doesn't exist already.
@@ -57,6 +63,8 @@ module Pdns
             File.open(filename, 'w') do |f|
                 YAML.dump(@stats, f)
             end
+
+            Pdns.debug("Saved stats to #{filename}")
         end
 
         # Reads stats from a file
@@ -71,6 +79,50 @@ module Pdns
             @stats.each_key do |k|
                 yield(k, @stats[k])
             end
+        end
+
+        # Utility to find all stats in the stats dir and return a single hash
+        # that aggregates all the found stats into one variable
+        def aggregate
+            totals = {}
+
+            Find.find(Pdns.config.statsdir) do |path| 
+                if path.match(/\/\d+.pstat$/)
+                    statage = Time.now.to_i - File.new(path).mtime.to_i
+
+                    # sleep a bit if the file is very new to give the writer 
+                    # time to update the file properly
+                    sleep 1 if statage < 2
+
+                    stat = {}
+
+                    # we only care for files newer than maint_interval + 30s, delete older
+                    # ones to avoid importing really old stats from children that
+                    # has been killed off by pdns
+                    if statage < (Pdns.config.maint_interval + 30)
+                        Pdns.debug("Parsing stats in #{path}")
+                        load_file(path) 
+
+                        each do |record, rs|
+                            totals[record] = {:usagecount => 0, :totaltime => 0} unless totals[record]
+                            totals[record][:usagecount] += rs[:usagecount]
+                            totals[record][:totaltime] += rs[:totaltime]
+                        end
+                    else
+                        Pdns.info("Deleting old data in #{path}")
+                        File.delete(path)
+                    end
+                end
+            end
+
+            totals
+        end
+
+        # Uses the aggregate function to get a sum of all stats and then overwrite the stats in the 
+        # object instance with the aggregate data effectively turning the current object into a access
+        # method to the aggregate data so to_file, each etc can be used on it.
+        def aggregate!
+            @stats = aggregate
         end
 
         private

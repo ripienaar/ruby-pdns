@@ -16,10 +16,14 @@ opts.each do |opt, arg|
         end
 end
 
-Pdns.config = Pdns::Config.new(conffile)
-stats = Pdns::Stats.new
+begin
+    Pdns.config = Pdns::Config.new(conffile)
+    stats = Pdns::Stats.new
 
-stats.aggregate!
-stats.to_file("#{Pdns.config.statsdir}/aggregate.pstat")
+    stats.aggregate!
+    stats.to_file("#{Pdns.config.statsdir}/aggregate.pstat")
+rescue Exception => e
+    STDERR.puts("Could not aggregate PDNS stats: #{e}")
+end
 
 # vi:tabstop=4:expandtab:ai:filetype=ruby

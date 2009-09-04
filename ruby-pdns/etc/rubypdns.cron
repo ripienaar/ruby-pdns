@@ -1,0 +1,1 @@
+*/5 * * * *  pdns /usr/sbin/pdns-aggregate-stats.rb --config /etc/pdns/pdns-ruby-backend.cfg

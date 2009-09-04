@@ -41,8 +41,8 @@ class TC_ResolversTests < Test::Unit::TestCase
                                      :localip   => "127.0.0.2",
                                      :remoteip  => "207.192.75.148" })
         
-        assert_equal resolvers.stats["test_if_stats_increment.ruby-pdns.org"][:usagecount], 1
-        assert_in_delta 0.1, resolvers.stats["test_if_stats_increment.ruby-pdns.org"][:totaltime], 0.5
+        assert_equal resolvers.stats.recordstats("test_if_stats_increment.ruby-pdns.org")[:usagecount], 1
+        assert_in_delta 0.1, resolvers.stats.recordstats("test_if_stats_increment.ruby-pdns.org")[:totaltime], 0.5
     end
 end
 

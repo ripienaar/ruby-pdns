@@ -34,6 +34,7 @@ rm -rf %{buildroot}
 %{__install} -m0755 sbin/pdns-pipe-runner.rb %{buildroot}/usr/sbin/pdns-pipe-runner.rb
 %{__install} -m0755 sbin/pdns-pipe-tester.rb %{buildroot}/usr/sbin/pdns-pipe-tester.rb
 %{__install} -m0755 sbin/pdns-aggregate-stats.rb %{buildroot}/usr/sbin/pdns-aggregate-stats.rb
+%{__install} -m0755 sbin/pdns-aggregate-stats.rb %{buildroot}/usr/sbin/pdns-get-stats.rb
 %{__install} -m0644 etc/rubypdns.cron %{buildroot}/etc/cron.d/rubypdns
 cp -R lib/pdns.rb %{buildroot}/%{ruby_sitelib}/
 cp -R lib/pdns/* %{buildroot}/%{ruby_sitelib}/pdns/
@@ -51,11 +52,16 @@ rm -rf %{buildroot}
 %config /etc/cron.d/rubypdns
 /usr/sbin/pdns-pipe-runner.rb
 /usr/sbin/pdns-pipe-tester.rb
+/usr/sbin/pdns-aggregate-stats.rb
+/usr/sbin/pdns-get-stats.rb
 %defattr(0755,pdns,pdns,0755)
 /var/log/pdns
 /var/log/pdns/stats
 
 %changelog
+* Tue Sep 08 2009 R.I.Pienaar <rip@devco.net> - 1.0
+- Add pdns-get-stats.rb and pdns-aggregate-stats.rb
+
 * Tue Aug 11 2009 R.I.Pienaar <rip@devco.net> - 0.4
 - Add pdns-pipe-tester.rb
 

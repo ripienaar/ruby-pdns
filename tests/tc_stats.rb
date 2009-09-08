@@ -40,6 +40,14 @@ class TC_StatsTests < Test::Unit::TestCase
         assert_equal s.stats, {"foo" => {:usagecount => 1, :totaltime => 0.1}}
     end
 
+    def test_include_record
+        s = Pdns::Stats.new
+
+        s.recorduse("foo", 0.1)
+
+        assert s.include_record?("foo")
+    end
+
     def test_yaml_dump
         s = Pdns::Stats.new
 

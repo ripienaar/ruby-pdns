@@ -88,7 +88,7 @@ spec = Gem::Specification.new do |s|
     s.files = FileList["{sbin,lib,etc}/**/*"].to_a
     s.require_path = "lib"
     s.bindir = "sbin"
-    s.executables = ["pdns-pipe-runner.rb", "pdns-pipe-tester.rb"]
+    s.executables = ["pdns-pipe-runner.rb", "pdns-pipe-tester.rb", "pdns-aggregate-stats.rb", "pdns-get-stats.rb"]
     s.has_rdoc = true
     s.extra_rdoc_files = ["README"]
 end

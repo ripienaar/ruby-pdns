@@ -44,6 +44,11 @@ module Pdns
             @stats[record] ? @stats[record] : newstat
         end
 
+        # figures out if stats for a given record exist
+        def include_record?(record)
+            @stats.include?(record)
+        end
+
         # Returns a YAML representation of the current stats
         def to_yaml
             YAML.dump(@stats)

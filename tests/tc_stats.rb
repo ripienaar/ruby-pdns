@@ -123,6 +123,17 @@ class TC_StatsTests < Test::Unit::TestCase
         assert_equal 1, s.recordstats("bar")[:usagecount]
         assert_in_delta 0.01, s.recordstats("bar")[:totaltime], 0.1
     end
+
+    def test_totals
+        s = Pdns::Stats.new
+        s.recorduse("foo", 0.1)
+        s.recorduse("bar", 0.1)
+
+        totals = s.totalstats
+
+        assert_equal 2, totals[:usagecount]
+        assert_in_delta 0.01, totals[:totaltime], 0.2
+    end
 end
 
 # vi:tabstop=4:expandtab:ai:filetype=ruby

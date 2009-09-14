@@ -17,6 +17,7 @@ module Pdns
         # resets all stats to nil
         def reset!
             @stats = {}
+            @totalstats = newstat
         end
 
         # sets the stats for a record to 0 only if it doesn't exist already.
@@ -35,6 +36,9 @@ module Pdns
 
             @stats[record][:usagecount] += 1
             @stats[record][:totaltime] += time
+
+            @totalstats[:usagecount] += 1
+            @totalstats[:totaltime] += time
         end
 
         # Returns the stats for a record or an empty record if its not set
@@ -42,6 +46,11 @@ module Pdns
             initstats(record) unless @stats[record]
 
             @stats[record] ? @stats[record] : newstat
+        end
+
+        # Returns the totals for all records usage
+        def totalstats
+            @totalstats
         end
 
         # figures out if stats for a given record exist

@@ -17,7 +17,7 @@ module Pdns
         # resets all stats to nil
         def reset!
             @stats = {}
-            @totalstats = newstat
+	    @stats["ruby-pdns-totals"] = newstat
         end
 
         # sets the stats for a record to 0 only if it doesn't exist already.
@@ -37,8 +37,8 @@ module Pdns
             @stats[record][:usagecount] += 1
             @stats[record][:totaltime] += time
 
-            @totalstats[:usagecount] += 1
-            @totalstats[:totaltime] += time
+            @stats["ruby-pdns-totals"][:usagecount] += 1
+            @stats["ruby-pdns-totals"][:totaltime] += time
         end
 
         # Returns the stats for a record or an empty record if its not set
@@ -50,7 +50,7 @@ module Pdns
 
         # Returns the totals for all records usage
         def totalstats
-            @totalstats
+            @stats["ruby-pdns-totals"]
         end
 
         # figures out if stats for a given record exist
@@ -75,7 +75,7 @@ module Pdns
         # Will raise exceptions if anything fails
         def to_file(filename)
             File.open(filename, 'w') do |f|
-                YAML.dump(@stats, f)
+                f.write(to_yaml)
             end
 
             Pdns.debug("Saved stats to #{filename}")

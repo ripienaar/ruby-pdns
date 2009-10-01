@@ -5,7 +5,7 @@ class TC_StatsTests < Test::Unit::TestCase
     def test_if_inits_to_none
         s = Pdns::Stats.new
 
-        assert_equal s.stats, {}
+        assert_equal s.stats, {"ruby-pdns-totals"=>{:usagecount=>0, :totaltime=>0}}
     end
 
     def test_if_increments_ok
@@ -14,11 +14,11 @@ class TC_StatsTests < Test::Unit::TestCase
         s.initstats("foo")
         s.recorduse("foo", 0.1)
 
-        assert_equal s.stats, {"foo" => {:usagecount => 1, :totaltime => 0.1}}
+        assert_equal s.recordstats("foo"), {:usagecount => 1, :totaltime => 0.1}
 
         s.recorduse("foo", 0.1)
 
-        assert_equal s.stats, {"foo" => {:usagecount => 2, :totaltime => 0.2}}
+        assert_equal s.recordstats("foo"), {:usagecount => 2, :totaltime => 0.2}
     end
 
     def test_reset
@@ -29,7 +29,7 @@ class TC_StatsTests < Test::Unit::TestCase
         s.recorduse("foo", 0.1)
         s.resetrecord("foo")
 
-        assert_equal s.stats, {"foo" => {:usagecount => 0, :totaltime => 0}}
+        assert_equal s.recordstats("foo"), {:usagecount => 0, :totaltime => 0}
     end
 
     def test_if_i_can_increment_nonexisting_record
@@ -37,7 +37,7 @@ class TC_StatsTests < Test::Unit::TestCase
 
         s.recorduse("foo", 0.1)
 
-        assert_equal s.stats, {"foo" => {:usagecount => 1, :totaltime => 0.1}}
+        assert_equal s.recordstats("foo"), {:usagecount => 1, :totaltime => 0.1}
     end
 
     def test_include_record
@@ -53,7 +53,7 @@ class TC_StatsTests < Test::Unit::TestCase
 
         s.recorduse("foo", 0.1)
 
-        assert_equal YAML.load(s.stats.to_yaml), {"foo" => {:usagecount => 1, :totaltime => 0.1}}
+        assert_equal YAML.load(s.stats.to_yaml), {"foo" => {:usagecount => 1, :totaltime => 0.1}, "ruby-pdns-totals"=>{:usagecount=>1, :totaltime=>0.1}}
     end
 
     def test_yaml_save_and_load

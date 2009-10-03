@@ -34,7 +34,7 @@ rm -rf %{buildroot}
 %{__install} -m0755 sbin/pdns-pipe-runner.rb %{buildroot}/usr/sbin/pdns-pipe-runner.rb
 %{__install} -m0755 sbin/pdns-pipe-tester.rb %{buildroot}/usr/sbin/pdns-pipe-tester.rb
 %{__install} -m0755 sbin/pdns-aggregate-stats.rb %{buildroot}/usr/sbin/pdns-aggregate-stats.rb
-%{__install} -m0755 sbin/pdns-aggregate-stats.rb %{buildroot}/usr/sbin/pdns-get-stats.rb
+%{__install} -m0755 sbin/pdns-get-stats.rb %{buildroot}/usr/sbin/pdns-get-stats.rb
 %{__install} -m0644 etc/rubypdns.cron %{buildroot}/etc/cron.d/rubypdns
 cp -R lib/pdns.rb %{buildroot}/%{ruby_sitelib}/
 cp -R lib/pdns/* %{buildroot}/%{ruby_sitelib}/pdns/

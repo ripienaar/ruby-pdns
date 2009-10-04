@@ -41,7 +41,12 @@ begin
         totaltime = r[:totaltime] * multiplier
         totaltime = totaltime.to_i if multiplier == 1000000
 
-        puts("usagecount:#{r[:usagecount]} totaltime:#{totaltime}")
+        average = r[:totaltime] / r[:usagecount]
+        average = average * multiplier
+        average = average.to_i if multiplier == 1000000
+
+
+        puts("usagecount:#{r[:usagecount]} totaltime:#{totaltime} averagetime:#{average}")
     else
         raise("Cannot find stats for record #{record}")
     end

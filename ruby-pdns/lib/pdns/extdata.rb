@@ -12,6 +12,9 @@ module Pdns
         # Loads all data files in data dir, first it zeros the Hash containing all data
         # then goes through all files and load them, this ensures we have no unintended 
         # stale data at any time
+        #
+        # We should figure out some kind of flocking here so that updating and loading 
+        # doesnt clash
         def loaddata
             datadir = Pdns.config.datadir
             @data = Hash.new
@@ -24,7 +27,7 @@ module Pdns
             dir.entries.grep(/\.pdb$/).each do |r|
                 Pdns.debug("Loading data from #{datadir}/#{r}")
                 
-                pdbname = File.basename(r, ".pdb").to_sym
+                pdbname = File.basename(r, ".pdb")
 
                 begin
                     @data[pdbname] = Hash.new
@@ -49,6 +52,28 @@ module Pdns
             return default unless @data.include?(record)
 
             @data[record][:data].include?(key) ? @data[record][:data][key] : default
+        end
+
+        # Means of updating the data kept on disk, this should be called from
+        # a REST API or something.
+        #
+        # We should figure out some kind of flocking here so that updating and loading 
+        # doesnt clash
+        def update(record, key, val)
+            datadir = Pdns.config.datadir
+
+            Pdns.debug("Updating data for #{record}/#{key} = #{val} in #{datadir}")
+
+            raise "Cannot process external data, #{datadir} does not exist" unless File.directory?(datadir)
+
+            @data[record] = {:data => {}}  unless @data.include? record
+
+            @data[record][:data][key] = val
+            @data[record][:data][:updated] = Time.now.to_i
+
+            File.open("#{datadir}/#{record}.pdb", "w") do |f|
+                f.write(YAML.dump(@data[record][:data]))
+            end
         end
     end
 end

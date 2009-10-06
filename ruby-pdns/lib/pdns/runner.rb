@@ -73,10 +73,18 @@ module Pdns
 
                 @lastmaint = Time.now
 
+                # Save Stats
                 begin
                    @resolver.stats.save if Pdns.config.recordstats
                 rescue Exception => e
                     Pdns.error("Could not save stats: #{e}")
+                end
+
+                # Refresh external data
+                begin
+                    Pdns.extdata.loaddata
+                rescue Exception => e
+                    Pdns.error("Could not load external data: #{e}")
                 end
 
                 Pdns.debug "Ending maintenance routines"

@@ -58,6 +58,11 @@ module Pdns
         @@extdata = extdata
     end
 
+    # Gives access to the Pdns::Extdata instance
+    def self.extdata
+        @@extdata
+    end
+
     # Returns the previously saved instance of Pdns::Config
     def self.config
         @@config

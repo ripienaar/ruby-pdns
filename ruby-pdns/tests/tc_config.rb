@@ -21,6 +21,7 @@ class TC_Config < Test::Unit::TestCase
         assert_equal c.max_log_size, 1024000
         assert_equal c.maint_interval, 60
         assert_equal c.statsdir, "/var/log/pdns/stats"
+        assert_equal c.datadir, "/var/lib/pdns"
         assert_equal c.recordstats, true
         assert_equal c.modules, {}
     end

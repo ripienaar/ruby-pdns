@@ -31,7 +31,7 @@ module Pdns
         # Clears out all the resolvers that are supported, this should be called before loading new ones from disk
         # for example to be sure you don't have any weird leftovers
         #
-        # It only clears the @@resolvers hash not the @@resolverstats hash to keep stats across reloads
+        # It only clears the @@resolvers hash and not any stats to keep stats across reloads
         def self.empty!
             @@resolvers = {}
         end

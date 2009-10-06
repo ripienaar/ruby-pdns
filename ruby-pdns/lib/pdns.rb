@@ -23,6 +23,7 @@ module Pdns
     autoload :Config, "pdns/config.rb"
     autoload :Log, "pdns/log.rb"
     autoload :Stats, "pdns/stats.rb"
+    autoload :Extdata, "pdns/extdata.rb"
 
     # should have a copy of Pdns::Config
     @@config = nil

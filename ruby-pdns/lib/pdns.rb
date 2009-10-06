@@ -31,6 +31,9 @@ module Pdns
     # Instance of Pdns::Log
     @@logger = nil
 
+    # Instance of Pdns::Extdata
+    @@extdata = nil
+
     # Register a new code block to answer a specific
     # resource record
     def self.newrecord(name, &block)
@@ -50,9 +53,21 @@ module Pdns
         @@config = config
     end
 
+    # Saves the external data handler, should be an instance of Pdns::Extdata
+    def self.extdata=(extdata)
+        @@extdata = extdata
+    end
+
     # Returns the previously saved instance of Pdns::Config
     def self.config
         @@config
+    end
+
+    # Fetches a value from the external data for the current 
+    def self.data(key, default)
+        cur = Pdns::Resolvers.active_record
+        debug("Looking up key #{key} for record #{cur}")
+        @@extdata.data(cur, key, default)
     end
 
     ## methods other classes can use to acces our logger

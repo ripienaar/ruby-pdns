@@ -5,6 +5,8 @@ module Pdns
     class Extdata
         def initialize
             loaddata
+
+            Pdns.extdata = self
         end
 
         # Loads all data files in data dir, first it zeros the Hash containing all data

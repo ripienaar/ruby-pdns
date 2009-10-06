@@ -13,6 +13,12 @@ module Pdns
 
         @@stats = nil
 
+        def initialize
+            Pdns.extdata = Pdns::Extdata.new
+
+            @@currentrecord = nil
+        end
+
         # Adds a resolver to the list of known resolvers
         # 
         # name - should be the DNS RR to answer for
@@ -34,6 +40,12 @@ module Pdns
         # It only clears the @@resolvers hash and not any stats to keep stats across reloads
         def self.empty!
             @@resolvers = {}
+        end
+
+        # A way to figure out what record is currently being served by the resolver, this is so that
+        # requests for external data etc can be restricted to data that the record is allowed to see
+        def self.active_record
+            @@currentrecord
         end
 
         # Use this to figure out if a specific request could be answered by 
@@ -82,6 +94,7 @@ module Pdns
         # Before a query can be answered a resolver should have been added using add_resolver
         def do_query(request)
             starttime = Time.now.to_f
+            @@currentrecord = request[:qname]
 
             qname = request[:qname]
             lqname = qname.downcase

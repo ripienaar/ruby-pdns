@@ -3,7 +3,7 @@ module Pdns
     # an instance of this 
     class Response
         # Valid query types we understand
-        VALIDQTYPES = [:A, :CNAME, :NS, :SRV, :MX, :TXT]
+        VALIDQTYPES = [:A, :CNAME, :NS, :SRV, :MX, :TXT, :PTR]
 
         # Valid response types we understand
         VALIDQCLASSES = [:IN]

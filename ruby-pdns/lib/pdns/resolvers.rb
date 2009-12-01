@@ -28,7 +28,7 @@ module Pdns
             name.downcase!
 
             Pdns.debug("Adding resolver #{name} into list of workers")
-            @@resolvers[name] = {:options => options, :block => block, :loadedat => Time.now}
+            @@resolvers[name] = Pdns::Record.new(name, options, &block)
 
             @@stats = Pdns::Stats.new unless @@stats
             @@stats.initstats(name)
@@ -59,7 +59,7 @@ module Pdns
         def type(request)
             if can_answer?(request)
                 name = request[:qname].downcase
-                return @@resolvers[name][:options][:type]
+                return @@resolvers[name].options[:type]
             end
         end
 
@@ -115,7 +115,7 @@ module Pdns
             $stdout = File.new('/dev/null', 'w')
 
             begin
-                r[:block].call(request, answer)
+                r.block.call(request, answer)
 
                 # restore stdout
                 $stdout = orig_stdout

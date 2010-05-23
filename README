@@ -1,0 +1,8 @@
+Ruby PDNS Pipe Backend
+======================
+
+This is a framework for hosting specific records using Power DNS, you can code the logic
+for these records in ruby, the framework takes care of the hard work like hosting your
+code and speaking to PDNS.
+
+Find more information at http://code.google.com/p/ruby-pdns/
